@@ -21,7 +21,7 @@ docker build -t hseeberger/dockerfile-scala-sbt github.com/hseeberger/dockerfile
 ## Usage ##
 
 ```
-docker run -it --rm dockerfile/ubuntu
+docker run -it --rm hseeberger/dockerfile-scala-sbt
 ```
 
 
