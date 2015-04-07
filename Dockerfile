@@ -7,20 +7,23 @@
 # Pull base image
 FROM dockerfile/java:oracle-java8
 
+ENV SCALA_VERSION 2.11.6
+ENV SBT_VERSION 0.13.8
+
 # Install Scala
 RUN \
   cd /root && \
-  curl -o scala-2.11.4.tgz http://downloads.typesafe.com/scala/2.11.4/scala-2.11.4.tgz && \
-  tar -xf scala-2.11.4.tgz && \
-  rm scala-2.11.4.tgz && \
+  curl -o scala-$SCALA_VERSION.tgz http://downloads.typesafe.com/scala/$SCALA-VERSION/scala-$SCALA_VERSION.tgz && \
+  tar -xf scala-$SCALA_VERSION.tgz && \
+  rm scala-$SCALA_VERSION.tgz && \
   echo >> /root/.bashrc && \
-  echo 'export PATH=~/scala-2.11.4/bin:$PATH' >> /root/.bashrc
+  echo 'export PATH=~/scala-$SCALA_VERSION/bin:$PATH' >> /root/.bashrc
 
 # Install sbt
 RUN \
-  curl -L -o sbt-0.13.7.deb https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb && \
-  dpkg -i sbt-0.13.7.deb && \
-  rm sbt-0.13.7.deb && \
+  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
+  dpkg -i sbt-$SBT_VERSION.deb && \
+  rm sbt-$SBT_VERSION.deb && \
   apt-get update && \
   apt-get install sbt
 
