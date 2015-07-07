@@ -5,9 +5,9 @@
 #
 
 # Pull base image
-FROM dockerfile/java:oracle-java8
+FROM java:8
 
-ENV SCALA_VERSION 2.11.6
+ENV SCALA_VERSION 2.11.7
 ENV SBT_VERSION 0.13.8
 
 # Install Scala
