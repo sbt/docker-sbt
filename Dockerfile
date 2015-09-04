@@ -11,11 +11,9 @@ ENV SCALA_VERSION 2.11.7
 ENV SBT_VERSION 0.13.8
 
 # Install Scala
+## Piping curl directly in tar 
 RUN \
-  cd /root && \
-  curl -o scala-$SCALA_VERSION.tgz http://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz && \
-  tar -xf scala-$SCALA_VERSION.tgz && \
-  rm scala-$SCALA_VERSION.tgz && \
+  curl -fsL http://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
   echo >> /root/.bashrc && \
   echo 'export PATH=~/scala-$SCALA_VERSION/bin:$PATH' >> /root/.bashrc
 
