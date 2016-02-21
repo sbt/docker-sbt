@@ -8,10 +8,10 @@
 FROM java:8
 
 ENV SCALA_VERSION 2.11.7
-ENV SBT_VERSION 0.13.8
+ENV SBT_VERSION 0.13.9
 
 # Install Scala
-## Piping curl directly in tar 
+## Piping curl directly in tar
 RUN \
   curl -fsL http://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
   echo >> /root/.bashrc && \
