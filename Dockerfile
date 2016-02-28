@@ -8,7 +8,7 @@
 FROM java:8
 
 ENV SCALA_VERSION 2.11.7
-ENV SBT_VERSION 0.13.9
+ENV SBT_VERSION 0.13.11
 
 # Install Scala
 ## Piping curl directly in tar
