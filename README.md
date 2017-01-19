@@ -5,13 +5,13 @@ This repository contains **Dockerfile** of [Scala](http://www.scala-lang.org) an
 
 ## Base Docker Image ##
 
-* [java:8](https://registry.hub.docker.com/_/java/)
+* [openjdk:8](https://hub.docker.com/_/openjdk)
 
 
 ## Installation ##
 
 1. Install [Docker](https://www.docker.com)
-2. Pull [automated build](https://registry.hub.docker.com/u/hseeberger/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com/):
+2. Pull [automated build](https://registry.hub.docker.com/u/hseeberger/scala-sbt) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
 docker pull hseeberger/scala-sbt
 ```
