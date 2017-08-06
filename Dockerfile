@@ -5,7 +5,7 @@
 #
 
 # Pull base image
-FROM  openjdk:8u131-jdk
+FROM  openjdk:8u141-jdk
 
 ENV SCALA_VERSION 2.12.3
 ENV SBT_VERSION 0.13.16
