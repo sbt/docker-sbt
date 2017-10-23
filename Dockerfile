@@ -5,7 +5,7 @@
 #
 
 # Pull base image
-FROM  openjdk:8u141-jdk
+FROM openjdk:8u141
 
 ENV SCALA_VERSION 2.12.3
 ENV SBT_VERSION 1.0.1
@@ -18,7 +18,7 @@ RUN touch /usr/lib/jvm/java-8-openjdk-amd64/release
 RUN \
   curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
   echo >> /root/.bashrc && \
-  echo 'export PATH=~/scala-$SCALA_VERSION/bin:$PATH' >> /root/.bashrc
+  echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
 
 # Install sbt
 RUN \
