@@ -9,7 +9,7 @@ FROM openjdk:8u151
 
 # Env variables
 ENV SCALA_VERSION 2.12.4
-ENV SBT_VERSION 1.0.2
+ENV SBT_VERSION 1.0.3
 
 # Scala expects this file
 RUN touch /usr/lib/jvm/java-8-openjdk-amd64/release
@@ -28,6 +28,7 @@ RUN \
   rm sbt-$SBT_VERSION.deb && \
   apt-get update && \
   apt-get install sbt && \
+  apt-get install bc && \
   sbt sbtVersion
 
 # Define working directory
