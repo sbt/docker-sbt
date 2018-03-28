@@ -5,7 +5,7 @@
 #
 
 # Pull base image
-FROM openjdk:8u151
+FROM openjdk:8u151-slim
 
 # Env variables
 ENV SCALA_VERSION 2.12.5
@@ -17,6 +17,7 @@ RUN touch /usr/lib/jvm/java-8-openjdk-amd64/release
 # Install Scala
 ## Piping curl directly in tar
 RUN \
+  apt-get update && apt-get install -y curl && \
   curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
   echo >> /root/.bashrc && \
   echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
