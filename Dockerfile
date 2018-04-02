@@ -5,7 +5,7 @@
 #
 
 # Pull base image
-FROM openjdk:8u151
+FROM openjdk:8u162
 
 # Env variables
 ENV SCALA_VERSION 2.12.4
