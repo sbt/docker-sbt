@@ -9,7 +9,7 @@ FROM openjdk:11.0.1-jdk
 
 # Env variables
 ENV SCALA_VERSION 2.12.7
-ENV SBT_VERSION 1.2.6
+ENV SBT_VERSION 1.2.7
 
 # Scala expects this file
 RUN touch /usr/lib/jvm/java-11-openjdk-amd64/release
