@@ -5,14 +5,11 @@
 #
 
 # Pull base image
-FROM openjdk:11.0.1-jdk
+FROM openjdk:8u181
 
 # Env variables
 ENV SCALA_VERSION 2.12.8
 ENV SBT_VERSION 1.2.7
-
-# Scala expects this file
-RUN touch /usr/lib/jvm/java-11-openjdk-amd64/release
 
 # Install Scala
 ## Piping curl directly in tar
