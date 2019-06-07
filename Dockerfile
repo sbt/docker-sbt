@@ -33,5 +33,14 @@ RUN \
   sbt compile && \
   rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 
+# Add and use user sbt
+RUN groupadd --gid 1001 sbtuser && useradd --gid 1001 --uid 1001 sbtuser --shell /bin/bash
+RUN chown -R sbtuser:sbtuser /opt
+RUN mkdir /home/sbtuser && chown -R sbtuser:sbtuser /home/sbtuser
+RUN mkdir /logs && chown -R sbtuser:sbtuser /logs
+USER sbtuser
+
 # Define working directory
-WORKDIR /root
+WORKDIR /home/sbtuser
+
+CMD ["sbt"]
