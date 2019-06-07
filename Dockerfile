@@ -7,16 +7,10 @@
 # Pull base image
 FROM openjdk:11.0.2
 
+
 # Env variables
 ENV SCALA_VERSION 2.12.8
 ENV SBT_VERSION 1.2.8
-
-# Install Scala
-## Piping curl directly in tar
-RUN \
-  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
-  echo >> /root/.bashrc && \
-  echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
 
 # Install sbt
 RUN \
@@ -24,16 +18,9 @@ RUN \
   dpkg -i sbt-$SBT_VERSION.deb && \
   rm sbt-$SBT_VERSION.deb && \
   apt-get update && \
-  apt-get install sbt && \
-  sbt sbtVersion && \
-  mkdir project && \
-  echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
-  echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
-  echo "case object Temp" > Temp.scala && \
-  sbt compile && \
-  rm -r project && rm build.sbt && rm Temp.scala && rm -r target
+  apt-get install sbt
 
-# Add and use user sbt
+# Add and use user sbtuser
 RUN groupadd --gid 1001 sbtuser && useradd --gid 1001 --uid 1001 sbtuser --shell /bin/bash
 RUN chown -R sbtuser:sbtuser /opt
 RUN mkdir /home/sbtuser && chown -R sbtuser:sbtuser /home/sbtuser
@@ -42,5 +29,22 @@ USER sbtuser
 
 # Define working directory
 WORKDIR /home/sbtuser
+
+# Install Scala
+## Piping curl directly in tar
+RUN \
+  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /home/sbtuser/ && \
+  echo >> /home/sbtuser/.bashrc && \
+  echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /home/sbtuser/.bashrc
+
+# Prepare sbt
+RUN \
+  sbt sbtVersion && \
+  mkdir -p project && \
+  echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
+  echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
+  echo "case object Temp" > Temp.scala && \
+  sbt compile && \
+  rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 
 CMD ["sbt"]
