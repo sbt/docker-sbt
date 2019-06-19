@@ -27,6 +27,19 @@ docker build -t hseeberger/scala-sbt github.com/hseeberger/scala-sbt
 docker run -it --rm hseeberger/scala-sbt
 ```
 
+### Alternative commands ###
+The container contains `bash`, `scala` and `sbt`.
+
+```
+docker run -it --rm hseeberger/scala-sbt scala
+```
+
+### Non-root ###
+The container is prepared to be used with a non-root user called `sbtuser`
+
+```
+docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt
+```
 
 ## Contribution policy ##
 

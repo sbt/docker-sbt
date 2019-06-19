@@ -26,8 +26,8 @@ RUN mkdir /home/sbtuser && chown -R sbtuser:sbtuser /home/sbtuser
 RUN mkdir /logs && chown -R sbtuser:sbtuser /logs
 USER sbtuser
 
-# Define working directory
-WORKDIR /home/sbtuser
+# Switch working directory
+WORKDIR /home/sbtuser  
 
 # Install Scala
 ## Piping curl directly in tar
@@ -46,4 +46,16 @@ RUN \
   sbt compile && \
   rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 
-CMD ["sbt"]
+# Link everything into root as well
+# This allows users of this container to choose, whether they want to run the container as sbtuser (non-root) or as root
+USER root
+RUN \
+  echo "export PATH=/home/sbtuser/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc && \
+  ln -s /home/sbtuser/.ivy2 /root/.ivy2 && \
+  ln -s /home/sbtuser/.sbt /root/.sbt
+
+# Switch working directory back to root
+## Users wanting to use this container as non-root should combine the two following arguments
+## -u sbtuser
+## -w /home/sbtuser
+WORKDIR /root  
