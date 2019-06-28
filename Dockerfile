@@ -5,10 +5,10 @@
 #
 
 # Pull base image
-FROM openjdk:8u212-b04-jdk-stretch
+FROM openjdk:11.0.3
 
 # Env variables
-ENV SCALA_VERSION 2.13.0
+ENV SCALA_VERSION 2.12.8
 ENV SBT_VERSION 1.2.8
 
 # Install sbt
