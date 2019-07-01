@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source $DIR/vars.sh
+
+while read -r line; do
+    if [ ${#line} -ne 0 ]; then  # Ignore the empty lines
+        eval "$line source $DIR/build.sh"
+    fi
+done <<< "$VARS"

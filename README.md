@@ -16,9 +16,25 @@ This repository contains **Dockerfile** of [Scala](http://www.scala-lang.org) an
 docker pull hseeberger/scala-sbt
 ```
 Alternatively, you can build an image from Dockerfile:
+(<= openjdk11):
 ```
-docker build -t hseeberger/scala-sbt github.com/hseeberger/scala-sbt
+docker build \
+  --build-arg BASE_IMAGE_TAG="8u212-b04-jdk-stretch" \
+  --build-arg SBT_VERSION="1.2.8" \
+  --build-arg SCALA_VERSION="2.13.0" \
+  -t hseeberger/scala-sbt \
+  github.com/hseeberger/scala-sbt.git#:debian
 ```
+(openjdk12):
+```
+docker build \
+  --build-arg BASE_IMAGE_TAG="12.0.1-jdk-oraclelinux7" \
+  --build-arg SBT_VERSION="1.2.8" \
+  --build-arg SCALA_VERSION="2.13.0" \
+  -t hseeberger/scala-sbt \
+  github.com/hseeberger/scala-sbt.git#:oracle
+```
+
 
 
 ## Usage ##

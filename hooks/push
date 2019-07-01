@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -ex
+
+# Don't push images if branch is not master
+echo "Current Branch: $SOURCE_BRANCH"
+if [ "${SOURCE_BRANCH}" != "master" ]; then
+    exit 0
+fi
+
+for tag in $(docker images hseeberger/scala-sbt --format "{{.Tag}}");
+do
+    docker push "hseeberger/scala-sbt:${tag}"
+done
