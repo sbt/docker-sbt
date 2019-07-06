@@ -5,7 +5,8 @@
 #
 
 # Pull base image
-FROM openjdk:8u212-b04-jdk-stretch
+ARG base_image_tag=8-jdk
+FROM openjdk:$base_image_tag
 
 # Env variables
 ENV SCALA_VERSION 2.13.0
