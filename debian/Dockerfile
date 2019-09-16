@@ -6,7 +6,7 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM openjdk:${BASE_IMAGE_TAG:-8u212-b04-jdk-stretch}
+FROM openjdk:${BASE_IMAGE_TAG:-8u222-jdk-stretch}
 
 # Env variables
 ARG SCALA_VERSION
