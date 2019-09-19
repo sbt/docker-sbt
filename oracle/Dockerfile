@@ -6,7 +6,7 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM openjdk:${BASE_IMAGE_TAG:-8u212-b04-jdk-stretch}
+FROM openjdk:${BASE_IMAGE_TAG:-11.0.2-jdk-oraclelinux7}
 
 # Env variables
 ARG SCALA_VERSION
@@ -19,8 +19,8 @@ RUN \
   curl -L -o sbt-$SBT_VERSION.rpm https://bintray.com/sbt/rpm/download_file?file_path=sbt-$SBT_VERSION.rpm && \
   rpm -i sbt-$SBT_VERSION.rpm && \
   rm sbt-$SBT_VERSION.rpm && \
-  yum update && \
-  yum install sbt
+  yum -y update && \
+  yum -y install sbt
 
 # Add and use user sbtuser
 RUN groupadd --gid 1001 sbtuser && useradd --gid 1001 --uid 1001 sbtuser --shell /bin/bash
