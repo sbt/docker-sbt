@@ -22,6 +22,15 @@ RUN \
   yum -y update && \
   yum -y install sbt
 
+# Install Scala
+## Piping curl directly in tar
+RUN \
+  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /usr/share && \
+  mv /usr/share/scala-$SCALA_VERSION /usr/share/scala && \
+  chown -R root:root /usr/share/scala && \
+  chmod -R 755 /usr/share/scala && \
+  ln -s /usr/share/scala/bin/scala /usr/local/bin/scala
+
 # Add and use user sbtuser
 RUN groupadd --gid 1001 sbtuser && useradd --gid 1001 --uid 1001 sbtuser --shell /bin/bash
 RUN chown -R sbtuser:sbtuser /opt
@@ -32,14 +41,7 @@ USER sbtuser
 # Switch working directory
 WORKDIR /home/sbtuser  
 
-# Install Scala
-## Piping curl directly in tar
-RUN \
-  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /home/sbtuser/ && \
-  echo >> /home/sbtuser/.bashrc && \
-  echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /home/sbtuser/.bashrc
-
-# Prepare sbt
+# Prepare sbt (warm cache)
 RUN \
   sbt sbtVersion && \
   mkdir -p project && \
@@ -53,7 +55,7 @@ RUN \
 # This allows users of this container to choose, whether they want to run the container as sbtuser (non-root) or as root
 USER root
 RUN \
-  echo "export PATH=/home/sbtuser/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc && \
+  ln -s /home/sbtuser/.cache /root/.cache && \
   ln -s /home/sbtuser/.ivy2 /root/.ivy2 && \
   ln -s /home/sbtuser/.sbt /root/.sbt
 
