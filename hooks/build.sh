@@ -8,5 +8,7 @@ docker build $DOCKER_CONTEXT \
     -t "$TAG" \
     --build-arg BASE_IMAGE_TAG=$BASE_IMAGE_TAG \
     --build-arg SBT_VERSION=$SBT_VERSION \
-    --build-arg SCALA_VERSION=$SCALA_VERSION
+    --build-arg SCALA_VERSION=$SCALA_VERSION \
+    --build-arg USER_ID=$USER_ID \
+    --build-arg GROUP_ID=$GROUP_ID
 

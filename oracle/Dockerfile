@@ -13,6 +13,10 @@ ARG SCALA_VERSION
 ENV SCALA_VERSION ${SCALA_VERSION:-2.13.1}
 ARG SBT_VERSION
 ENV SBT_VERSION ${SBT_VERSION:-1.3.3}
+ARG USER_ID
+ENV USER_ID ${USER_ID:-1001}
+ARG GROUP_ID 
+ENV GROUP_ID ${GROUP_ID:-1001}
 
 # Install sbt
 RUN \
@@ -32,7 +36,7 @@ RUN \
   ln -s /usr/share/scala/bin/scala /usr/local/bin/scala
 
 # Add and use user sbtuser
-RUN groupadd --gid 1001 sbtuser && useradd --gid 1001 --uid 1001 sbtuser --shell /bin/bash
+RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
 RUN chown -R sbtuser:sbtuser /opt
 # RUN mkdir /home/sbtuser && chown -R sbtuser:sbtuser /home/sbtuser
 RUN mkdir /logs && chown -R sbtuser:sbtuser /logs
