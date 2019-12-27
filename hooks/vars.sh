@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SBT_VERSION='1.3.5'
+SBT_VERSION='1.3.6'
 
 export VARS="
 TAG=\"8u222_${SBT_VERSION}_2.13.1\" DOCKER_CONTEXT=\"debian\" BASE_IMAGE_TAG=\"8u222-jdk-stretch\" SBT_VERSION=\"${SBT_VERSION}\" SCALA_VERSION=\"2.13.1\"
