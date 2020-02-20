@@ -13,7 +13,7 @@ This repository contains **Dockerfile** of [Scala](http://www.scala-lang.org) an
 1. Install [Docker](https://www.docker.com)
 2. Pull [automated build](https://hub.docker.com/r/hseeberger/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
-docker pull hseeberger/scala-sbt
+docker pull hseeberger/scala-sbt:8u222_1.3.0_2.13.0
 ```
 Alternatively, you can build an image from Dockerfile:
 (debian):
@@ -42,21 +42,21 @@ docker build \
 ## Usage ##
 
 ```
-docker run -it --rm hseeberger/scala-sbt
+docker pull hseeberger/scala-sbt:8u222_1.3.0_2.13.0
 ```
 
 ### Alternative commands ###
 The container contains `bash`, `scala` and `sbt`.
 
 ```
-docker run -it --rm hseeberger/scala-sbt scala
+docker run -it --rm hseeberger/scala-sbt:8u222_1.3.0_2.13.0 scala
 ```
 
 ### Non-root ###
 The container is prepared to be used with a non-root user called `sbtuser`
 
 ```
-docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt
+docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt:8u222_1.3.0_2.13.0
 ```
 
 ## Contribution policy ##
