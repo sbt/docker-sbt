@@ -13,15 +13,15 @@ This repository contains **Dockerfile** of [Scala](http://www.scala-lang.org) an
 1. Install [Docker](https://www.docker.com)
 2. Pull [automated build](https://hub.docker.com/r/hseeberger/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
-docker pull hseeberger/scala-sbt:8u222_1.3.5_2.13.2
+docker pull hseeberger/scala-sbt:8u222_1.3.12_2.13.3
 ```
 Alternatively, you can build an image from Dockerfile:
 (debian):
 ```
 docker build \
   --build-arg BASE_IMAGE_TAG="8u212-b04-jdk-stretch" \
-  --build-arg SBT_VERSION="1.3.5" \
-  --build-arg SCALA_VERSION="2.13.2" \
+  --build-arg SBT_VERSION="1.3.12" \
+  --build-arg SCALA_VERSION="2.13.3" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
   -t hseeberger/scala-sbt \
@@ -31,8 +31,8 @@ docker build \
 ```
 docker build \
   --build-arg BASE_IMAGE_TAG="11.0.2-jdk-oraclelinux7" \
-  --build-arg SBT_VERSION="1.3.5" \
-  --build-arg SCALA_VERSION="2.13.2" \
+  --build-arg SBT_VERSION="1.3.12" \
+  --build-arg SCALA_VERSION="2.13.3" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
   -t hseeberger/scala-sbt \
@@ -42,21 +42,21 @@ docker build \
 ## Usage ##
 
 ```
-docker run -it --rm hseeberger/scala-sbt:8u222_1.3.5_2.13.2
+docker run -it --rm hseeberger/scala-sbt:8u222_1.3.12_2.13.3
 ```
 
 ### Alternative commands ###
 The container contains `bash`, `scala` and `sbt`.
 
 ```
-docker run -it --rm hseeberger/scala-sbt:8u222_1.3.5_2.13.2 scala
+docker run -it --rm hseeberger/scala-sbt:8u222_1.3.12_2.13.3 scala
 ```
 
 ### Non-root ###
 The container is prepared to be used with a non-root user called `sbtuser`
 
 ```
-docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt:8u222_1.3.5_2.13.2
+docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt:8u222_1.3.12_2.13.3
 ```
 
 ## Contribution policy ##
