@@ -24,7 +24,8 @@ RUN \
   dpkg -i sbt-$SBT_VERSION.deb && \
   rm sbt-$SBT_VERSION.deb && \
   apt-get update && \
-  apt-get install sbt
+  apt-get install sbt && \
+  apt-get install rpm
 
 # Install Scala
 ## Piping curl directly in tar
