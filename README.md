@@ -3,6 +3,12 @@
 This repository contains **Dockerfile** of [Scala](http://www.scala-lang.org) and [sbt](http://www.scala-sbt.org).
 
 
+## DockerHub
+
+As we think referencing unstable versions is a bad idea we don't publish a `latest` tag
+
+For a list of all available tags see https://hub.docker.com/r/hseeberger/scala-sbt/tags
+
 ## Base Docker Image ##
 
 * [openjdk](https://hub.docker.com/_/openjdk)
