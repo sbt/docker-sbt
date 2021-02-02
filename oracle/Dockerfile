@@ -6,7 +6,7 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM openjdk:${BASE_IMAGE_TAG:-11.0.2-jdk-oraclelinux7}
+FROM openjdk:${BASE_IMAGE_TAG:-11.0.10-jdk-oraclelinux8}
 
 # Env variables
 ARG SCALA_VERSION
@@ -23,8 +23,8 @@ RUN \
   curl -L -o sbt-$SBT_VERSION.rpm https://bintray.com/sbt/rpm/download_file?file_path=sbt-$SBT_VERSION.rpm && \
   rpm -i sbt-$SBT_VERSION.rpm && \
   rm sbt-$SBT_VERSION.rpm && \
-  yum -y update && \
-  yum -y install sbt
+  microdnf -y update && \
+  microdnf -y install sbt
 
 # Install Scala
 ## Piping curl directly in tar
