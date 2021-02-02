@@ -6,7 +6,7 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM oracle/graalvm-ce:${BASE_IMAGE_TAG:-20.0.0-java11}
+FROM ghcr.io/graalvm/graalvm-ce:${BASE_IMAGE_TAG:-java11-21.0.0}
 
 # Env variables
 ARG SCALA_VERSION
@@ -24,8 +24,8 @@ RUN \
   curl -L -o sbt-$SBT_VERSION.rpm https://bintray.com/sbt/rpm/download_file?file_path=sbt-$SBT_VERSION.rpm && \
   rpm -i sbt-$SBT_VERSION.rpm && \
   rm sbt-$SBT_VERSION.rpm && \
-  yum -y update && \
-  yum -y install sbt
+  microdnf -y update && \
+  microdnf -y install sbt
 
 # Install Scala
 ## Piping curl directly in tar
