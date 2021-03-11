@@ -43,8 +43,8 @@ jobs:
       id: get_sbt_version
       run: |
         SBT_VERSION=$(
-          curl -s https://dl.bintray.com/sbt/debian/Packages |
-          grep -i -w 'sbt-[0-9]*\.[0-9]*\.[0-9]*\.deb' -o |
+          curl -s curl -L https://github.com/sbt/sbt/releases/latest |
+          grep -i -w 'sbt-[0-9]*\.[0-9]*\.[0-9]*\.tgz' -o |
           grep -i -w '[0-9]*\.[0-9]*\.[0-9]*' -o |
           sort -V | tail -n 1)
         echo ::set-output name=VERSION::$SBT_VERSION

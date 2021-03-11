@@ -12,7 +12,7 @@ FROM openjdk:${BASE_IMAGE_TAG:-8u265-jdk-buster}
 ARG SCALA_VERSION
 ENV SCALA_VERSION ${SCALA_VERSION:-2.13.5}
 ARG SBT_VERSION
-ENV SBT_VERSION ${SBT_VERSION:-1.4.3}
+ENV SBT_VERSION ${SBT_VERSION:-1.4.9}
 ARG USER_ID
 ENV USER_ID ${USER_ID:-1001}
 ARG GROUP_ID 
@@ -20,20 +20,24 @@ ENV GROUP_ID ${GROUP_ID:-1001}
 
 # Install sbt
 RUN \
-  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
-  dpkg -i sbt-$SBT_VERSION.deb && \
-  rm sbt-$SBT_VERSION.deb && \
-  apt-get update && \
-  apt-get install sbt rpm -y
+  curl -fsL "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \
+  chown -R root:root /usr/share/sbt && \
+  chmod -R 755 /usr/share/sbt && \
+  ln -s /usr/share/sbt/bin/sbt /usr/local/bin/sbt
 
 # Install Scala
 ## Piping curl directly in tar
 RUN \
-  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /usr/share && \
-  mv /usr/share/scala-$SCALA_VERSION /usr/share/scala && \
+  case $SCALA_VERSION in \
+    "3"*) URL=https://github.com/lampepfl/dotty/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION ;; \
+    *) URL=https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=/usr/share/scala-$SCALA_VERSION ;; \
+  esac && \
+  curl -fsL $URL | tar xfz - -C /usr/share && \
+  mv $SCALA_DIR /usr/share/scala && \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
-  ln -s /usr/share/scala/bin/scala /usr/local/bin/scala
+  ln -s /usr/share/scala/bin/scala /usr/local/bin/scala && \
+  scala --version
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
