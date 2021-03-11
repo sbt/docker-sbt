@@ -36,7 +36,7 @@ RUN \
   mv $SCALA_DIR /usr/share/scala && \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
-  ln -s /usr/share/scala/bin/scala /usr/local/bin/scala && \
+  ln -s /usr/share/scala/bin/* /usr/local/bin && \
   echo "println(util.Properties.versionMsg)" > test.scala && scala test.scala && rm test.scala
 
 # Add and use user sbtuser
