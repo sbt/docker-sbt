@@ -37,8 +37,7 @@ RUN \
   mv $SCALA_DIR /usr/share/scala && \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
-  ln -s /usr/share/scala/bin/scala /usr/local/bin/scala && \
-  scala --version
+  ln -s /usr/share/scala/bin/scala /usr/local/bin/scala
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
