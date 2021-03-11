@@ -10,7 +10,7 @@ FROM openjdk:${BASE_IMAGE_TAG:-8u265-jdk-buster}
 
 # Env variables
 ARG SCALA_VERSION
-ENV SCALA_VERSION ${SCALA_VERSION:-2.13.5}
+ENV SCALA_VERSION ${SCALA_VERSION:-2.11.12}
 ARG SBT_VERSION
 ENV SBT_VERSION ${SBT_VERSION:-1.4.9}
 ARG USER_ID
@@ -37,7 +37,7 @@ RUN \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/scala /usr/local/bin/scala && \
-  echo "println(util.Properties.versionMsg)" > test.scala && scala --no-boot-class-path test.scala && rm test.scala
+  echo "println(util.Properties.versionMsg)" > test.scala && scala test.scala && rm test.scala
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
