@@ -37,7 +37,7 @@ RUN \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/scala /usr/local/bin/scala && \
-  echo "println(util.Properties.versionMsg)" > test.scala && scala --nobootcp test.scala && rm test.scala
+  echo "println(util.Properties.versionMsg)" > test.scala && scala test.scala && rm test.scala
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
