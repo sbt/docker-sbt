@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scalaVersion: ['2.11.12', '2.12.13', '2.13.5']
+        scalaVersion: ['2.12.13', '2.13.5']
         javaTag: ['8u282', '11.0.10', '15.0.2', '11.0.10-oraclelinux8', 'graalvm-ce-21.0.0-java11', 'graalvm-ce-21.0.0-java8']
         include:
           - javaTag: '8u282'
@@ -37,14 +37,18 @@ jobs:
           - javaTag: 'graalvm-ce-21.0.0-java8'
             dockerContext: 'graalvm-ce'
             baseImageTag: 'java8-21.0.0'
+          - scalaVersion: '2.11.12'
+            javaTag: '8u282'
+            dockerContext: 'debian'
+            baseImageTag: '8u282-jdk-buster'
     steps:
     - uses: actions/checkout@v1
     - name: Get latest SBT version
       id: get_sbt_version
       run: |
         SBT_VERSION=$(
-          curl -s https://dl.bintray.com/sbt/debian/Packages |
-          grep -i -w 'sbt-[0-9]*\.[0-9]*\.[0-9]*\.deb' -o |
+          curl -s curl -L https://github.com/sbt/sbt/releases/latest |
+          grep -i -w 'sbt-[0-9]*\.[0-9]*\.[0-9]*\.tgz' -o |
           grep -i -w '[0-9]*\.[0-9]*\.[0-9]*' -o |
           sort -V | tail -n 1)
         echo ::set-output name=VERSION::$SBT_VERSION
