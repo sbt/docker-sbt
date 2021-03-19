@@ -26,7 +26,6 @@ RUN \
   ln -s /usr/share/sbt/bin/sbt /usr/local/bin/sbt
 
 # Install Scala
-## Piping curl directly in tar
 RUN \
   case $SCALA_VERSION in \
     "3"*) URL=https://github.com/lampepfl/dotty/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION ;; \
@@ -38,6 +37,12 @@ RUN \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/* /usr/local/bin && \
   echo "println(util.Properties.versionMsg)" > test.scala && scala test.scala && rm test.scala
+
+# Install rpm for sbt-native-packager
+# see https://github.com/hseeberger/scala-sbt/pull/114
+RUN apt-get update && \
+  apt-get install rpm -y && \
+  rm -rf /var/lib/apt/lists/*
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
