@@ -41,6 +41,10 @@ jobs:
             javaTag: '8u282'
             dockerContext: 'debian'
             baseImageTag: '8u282-jdk-buster'
+        exclude:
+          # scala 3.x broken on oraclelinux?
+          - scalaVersion: 3.0.0-RC2
+            javaTag: 11.0.10-oraclelinux8
     steps:
     - uses: actions/checkout@v1
     - name: Get latest SBT version
