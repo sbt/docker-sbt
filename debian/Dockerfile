@@ -12,7 +12,7 @@ FROM openjdk:${BASE_IMAGE_TAG:-8u265-jdk-buster}
 ARG SCALA_VERSION
 ENV SCALA_VERSION ${SCALA_VERSION:-2.13.5}
 ARG SBT_VERSION
-ENV SBT_VERSION ${SBT_VERSION:-1.4.9}
+ENV SBT_VERSION ${SBT_VERSION:-1.5.0}
 ARG USER_ID
 ENV USER_ID ${USER_ID:-1001}
 ARG GROUP_ID 
@@ -36,7 +36,11 @@ RUN \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/* /usr/local/bin && \
-  echo "println(util.Properties.versionMsg)" > test.scala && scala test.scala && rm test.scala
+  case $SCALA_VERSION in \
+    "3"*) echo "@main def main = println(util.Properties.versionMsg)" > test.scala ;; \
+    *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
+  esac && \
+  scala test.scala && rm test.scala
 
 # Install rpm for sbt-native-packager
 # see https://github.com/hseeberger/scala-sbt/pull/114
