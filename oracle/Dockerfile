@@ -18,6 +18,9 @@ ENV USER_ID ${USER_ID:-1001}
 ARG GROUP_ID 
 ENV GROUP_ID ${GROUP_ID:-1001}
 
+# Install git because it's very useful to have that should the version be extracted from git
+RUN microdnf install git
+
 # Install findutils since find is required for scala 3
 RUN microdnf install findutils
 
