@@ -70,11 +70,9 @@ RUN \
 # This allows users of this container to choose, whether they want to run the container as sbtuser (non-root) or as root
 USER root
 RUN \
-  mkdir -p /home/sbtuser/.ivy2 && \
-  chown -R sbtuser:sbtuser /home/sbtuser/.ivy2 && \
   ln -s /home/sbtuser/.cache /root/.cache && \
-  ln -s /home/sbtuser/.ivy2 /root/.ivy2 && \
-  ln -s /home/sbtuser/.sbt /root/.sbt
+  ln -s /home/sbtuser/.sbt /root/.sbt && \
+  if [ -d "/home/sbtuser/.ivy2" ]; then ln -s /home/sbtuser/.ivy2 /root/.ivy2; fi
 
 # Switch working directory back to root
 ## Users wanting to use this container as non-root should combine the two following arguments
