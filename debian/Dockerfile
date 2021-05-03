@@ -81,3 +81,5 @@ RUN \
 ## -u sbtuser
 ## -w /home/sbtuser
 WORKDIR /root  
+
+CMD sbt
