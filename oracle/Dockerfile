@@ -18,6 +18,9 @@ ENV USER_ID ${USER_ID:-1001}
 ARG GROUP_ID 
 ENV GROUP_ID ${GROUP_ID:-1001}
 
+# Install findutils since find is required for scala 3
+RUN microdnf install findutils
+
 # Install sbt
 RUN \
   curl -fsL "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \
