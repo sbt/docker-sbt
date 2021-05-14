@@ -19,6 +19,7 @@ ARG GROUP_ID
 ENV GROUP_ID ${GROUP_ID:-1001}
 
 # Install findutils since find is required for scala 3
+# TODO Remove once this has been released: https://github.com/lampepfl/dotty/issues/11989
 RUN microdnf install findutils
 
 # Install sbt
