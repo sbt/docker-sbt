@@ -17,20 +17,20 @@ jobs:
     strategy:
       matrix:
         scalaVersion: ['2.12.13', '2.13.6', '3.0.0']
-        javaTag: ['8u282', '11.0.10', '16', '11.0.10-oraclelinux8', 'graalvm-ce-21.1.0-java11', 'graalvm-ce-21.1.0-java8']
+        javaTag: ['8u282', '11.0.11', '16', '11.0.11-oraclelinux8', 'graalvm-ce-21.1.0-java11', 'graalvm-ce-21.1.0-java8']
         include:
           - javaTag: '8u282'
             dockerContext: 'debian'
             baseImageTag: '8u282-jdk-buster'
-          - javaTag: '11.0.10'
+          - javaTag: '11.0.11'
             dockerContext: 'debian'
-            baseImageTag: '11.0.10-jdk-buster'
+            baseImageTag: '11.0.11-jdk-buster'
           - javaTag: '16'
             dockerContext: 'debian'
             baseImageTag: '16-jdk-buster'
-          - javaTag: '11.0.10-oraclelinux8'
+          - javaTag: '11.0.11-oraclelinux8'
             dockerContext: 'oracle'
-            baseImageTag: '11.0.10-jdk-oraclelinux8'
+            baseImageTag: '11.0.11-jdk-oraclelinux8'
           - javaTag: 'graalvm-ce-21.1.0-java11'
             dockerContext: 'graalvm-ce'
             baseImageTag: 'java11-21.1.0'
