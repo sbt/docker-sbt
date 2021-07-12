@@ -45,9 +45,6 @@ RUN \
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
-RUN chown -R sbtuser:sbtuser /opt
-# RUN mkdir /home/sbtuser && chown -R sbtuser:sbtuser /home/sbtuser
-RUN mkdir /logs && chown -R sbtuser:sbtuser /logs
 USER sbtuser
 
 # Switch working directory
