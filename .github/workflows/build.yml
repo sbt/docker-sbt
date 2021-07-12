@@ -69,16 +69,12 @@ jobs:
       if: ${{ !(startsWith(matrix.scalaVersion, '2.11') || startsWith(matrix.scalaVersion, '2.12')) }}
       # scala --version does not work on < 2.13
       run: |
-        docker run "${{ steps.create_docker_tag.outputs.TAG }}" \
-          scala --version &&
-          sbt about
+        docker run "${{ steps.create_docker_tag.outputs.TAG }}" scala --version && sbt about
     - name: Test docker image scala as sbtuser
       if: ${{ !(startsWith(matrix.scalaVersion, '2.11') || startsWith(matrix.scalaVersion, '2.12')) }}
       # scala --version does not work on < 2.13
       run: |
-        docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" \
-          scala --version &&
-          sbt about
+        docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" scala --version && sbt about
     - name: Push image to DockerHub
       if: github.event_name != 'pull_request'
       run: |
