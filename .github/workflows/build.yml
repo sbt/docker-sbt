@@ -37,10 +37,6 @@ jobs:
           - javaTag: 'graalvm-ce-21.1.0-java8'
             dockerContext: 'graalvm-ce'
             baseImageTag: 'java8-21.1.0'
-          - scalaVersion: '2.11.12'
-            javaTag: '8u282'
-            dockerContext: 'debian'
-            baseImageTag: '8u282-jdk-buster'
     steps:
     - uses: actions/checkout@v1
     - name: Get latest SBT version
