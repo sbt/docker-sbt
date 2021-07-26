@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         scalaVersion: ['2.12.14', '2.13.6', '3.0.1']
-        javaTag: ['8u302', '11.0.12', '16.0.2', '11.0.12-oraclelinux8', 'graalvm-ce-21.1.0-java11', 'graalvm-ce-21.1.0-java8']
+        javaTag: ['8u302', '11.0.12', '16.0.2', '11.0.12-oraclelinux8', 'graalvm-ce-21.2.0-java11', 'graalvm-ce-21.2.0-java8']
         include:
           - javaTag: '8u302'
             dockerContext: 'debian'
@@ -31,12 +31,12 @@ jobs:
           - javaTag: '11.0.12-oraclelinux8'
             dockerContext: 'oracle'
             baseImageTag: '11.0.12-jdk-oraclelinux8'
-          - javaTag: 'graalvm-ce-21.1.0-java11'
+          - javaTag: 'graalvm-ce-21.2.0-java11'
             dockerContext: 'graalvm-ce'
-            baseImageTag: 'java11-21.1.0'
-          - javaTag: 'graalvm-ce-21.1.0-java8'
+            baseImageTag: 'java11-21.2.0'
+          - javaTag: 'graalvm-ce-21.2.0-java8'
             dockerContext: 'graalvm-ce'
-            baseImageTag: 'java8-21.1.0'
+            baseImageTag: 'java8-21.2.0'
     steps:
     - uses: actions/checkout@v1
     - name: Get latest SBT version
