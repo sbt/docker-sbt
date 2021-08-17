@@ -53,11 +53,13 @@ jobs:
       run: |
         TAG=hseeberger/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo ::set-output name=TAG::$TAG
-    - run: docker buildx ls
+    - name: create the buildkit daemon and use the default builder
+      run: docker buildx create --use && docker buildx ls
     - name: Build docker image
       run: |
         docker build ${{ matrix.dockerContext }} \
             --no-cache \
+            --platform linux/amd64,linux/arm64 \
             -t "${{ steps.create_docker_tag.outputs.TAG }}" \
             --build-arg BASE_IMAGE_TAG=${{ matrix.baseImageTag }} \
             --build-arg SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }} \
