@@ -17,27 +17,32 @@ jobs:
     strategy:
       matrix:
         scalaVersion: ['2.12.14', '2.13.6', '3.0.1']
-        #javaTag: ['8u302', '11.0.12', '16.0.2', '11.0.12-oraclelinux8', 'graalvm-ce-21.2.0-java11', 'graalvm-ce-21.1.0-java8']
-        javaTag: ['11.0.12']
+        javaTag: ['8u302', '11.0.12', '16.0.2', '11.0.12-oraclelinux8', 'graalvm-ce-21.2.0-java11', 'graalvm-ce-21.1.0-java8']
         include:
-#          - javaTag: '8u302'
-#            dockerContext: 'debian'
-#            baseImageTag: '8u302-jdk-buster'
+          - javaTag: '8u302'
+            dockerContext: 'debian'
+            baseImageTag: '8u302-jdk-buster'
+            platforms: 'linux/amd64,linux/arm64'
           - javaTag: '11.0.12'
             dockerContext: 'debian'
             baseImageTag: '11.0.12-jdk-buster'
-#          - javaTag: '16.0.2'
-#            dockerContext: 'debian'
-#            baseImageTag: '16.0.2-jdk-buster'
-#          - javaTag: '11.0.12-oraclelinux8'
-#            dockerContext: 'oracle'
-#            baseImageTag: '11.0.12-jdk-oraclelinux8'
-#          - javaTag: 'graalvm-ce-21.2.0-java11'
-#            dockerContext: 'graalvm-ce'
-#            baseImageTag: 'java11-21.2.0'
-#          - javaTag: 'graalvm-ce-21.1.0-java8'
-#            dockerContext: 'graalvm-ce'
-#            baseImageTag: 'java8-21.1.0'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: '16.0.2'
+            dockerContext: 'debian'
+            baseImageTag: '16.0.2-jdk-buster'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: '11.0.12-oraclelinux8'
+            dockerContext: 'oracle'
+            baseImageTag: '11.0.12-jdk-oraclelinux8'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'graalvm-ce-21.2.0-java11'
+            dockerContext: 'graalvm-ce'
+            baseImageTag: 'java11-21.2.0'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'graalvm-ce-21.1.0-java8'
+            dockerContext: 'graalvm-ce'
+            baseImageTag: 'java8-21.1.0'
+            platforms: 'linux/amd64,linux/arm64'
     steps:
     - uses: actions/checkout@v1
     - name: Get latest SBT version
@@ -67,7 +72,7 @@ jobs:
       run: |
         docker buildx build ${{ matrix.dockerContext }} \
             --no-cache \
-            --platform linux/amd64,linux/arm64 \
+            --platform ${{ matrix.platforms }} \
             -t "${{ steps.create_docker_tag.outputs.TAG }}" \
             --build-arg BASE_IMAGE_TAG=${{ matrix.baseImageTag }} \
             --build-arg SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }} \
