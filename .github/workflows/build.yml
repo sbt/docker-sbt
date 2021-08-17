@@ -45,6 +45,15 @@ jobs:
             platforms: 'linux/amd64,linux/arm64'
     steps:
     - uses: actions/checkout@v1
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1.2.0
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1.5.1
+      #      with:
+      #        install: true
+    - name: Available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
     - name: Get latest SBT version
       id: get_sbt_version
       run: |
@@ -59,20 +68,10 @@ jobs:
       run: |
         TAG=hseeberger/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo ::set-output name=TAG::$TAG
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1.2.0
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v1.5.1
-      #      with:
-#        install: true
-    - name: Available platforms
-      run: echo ${{ steps.buildx.outputs.platforms }}
     - name: Build docker image
       run: |
-        docker buildx build ${{ matrix.dockerContext }} \
+        docker build ${{ matrix.dockerContext }} \
             --no-cache \
-            --platform ${{ matrix.platforms }} \
             -t "${{ steps.create_docker_tag.outputs.TAG }}" \
             --build-arg BASE_IMAGE_TAG=${{ matrix.baseImageTag }} \
             --build-arg SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }} \
@@ -91,8 +90,18 @@ jobs:
         docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" \
           scala --version &&
           sbt about
-    - name: Push image to DockerHub
+    - name: Log in to DockerHub
       if: github.event_name != 'pull_request'
       run: |
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u hseeberger --password-stdin
-        docker push ${{ steps.create_docker_tag.outputs.TAG }}
+    - name: Rebuild and push ${{ matrix.platforms }} docker images
+      if: github.event_name != 'pull_request'
+      run: |
+        docker buildx build ${{ matrix.dockerContext }} \
+            --no-cache \
+            -t "${{ steps.create_docker_tag.outputs.TAG }}" \
+            --build-arg BASE_IMAGE_TAG=${{ matrix.baseImageTag }} \
+            --build-arg SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }} \
+            --build-arg SCALA_VERSION=${{ matrix.scalaVersion }} \
+            --platform ${{ matrix.platforms }} \
+            --push
