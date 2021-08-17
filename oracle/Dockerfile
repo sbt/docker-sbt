@@ -41,7 +41,7 @@ RUN \
     "3"*) echo "@main def main = println(util.Properties.versionMsg)" > test.scala ;; \
     *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
   esac && \
-  scala test.scala && rm test.scala
+  scala -nocompdaemon test.scala && rm test.scala
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
