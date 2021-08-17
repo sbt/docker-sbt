@@ -40,7 +40,7 @@ RUN \
     "3"*) echo "@main def main = println(util.Properties.versionMsg)" > test.scala ;; \
     *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
   esac && \
-  scala test.scala && rm test.scala
+  scala -nocompdaemon test.scala && rm test.scala
 
 # Install rpm for sbt-native-packager
 # see https://github.com/hseeberger/scala-sbt/pull/114
