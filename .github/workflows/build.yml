@@ -57,7 +57,7 @@ jobs:
       run: docker buildx create --use && docker buildx ls
     - name: Build docker image
       run: |
-        docker build ${{ matrix.dockerContext }} \
+        docker buildx ${{ matrix.dockerContext }} \
             --no-cache \
             --platform linux/amd64,linux/arm64 \
             -t "${{ steps.create_docker_tag.outputs.TAG }}" \
