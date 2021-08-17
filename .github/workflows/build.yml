@@ -54,8 +54,15 @@ jobs:
       run: |
         TAG=hseeberger/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo ::set-output name=TAG::$TAG
-    - name: create the buildkit daemon and use the default builder
-      run: docker buildx create --use && docker buildx ls
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1.2.0
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1.5.1
+      #      with:
+#        install: true
+    - name: Available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
     - name: Build docker image
       run: |
         docker buildx build ${{ matrix.dockerContext }} \
@@ -83,4 +90,4 @@ jobs:
       if: github.event_name != 'pull_request'
       run: |
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u hseeberger --password-stdin
-        docker push ${{ steps.create_docker_tag.outputs.TAG }}
+        docker buildx push ${{ steps.create_docker_tag.outputs.TAG }}
