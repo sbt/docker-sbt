@@ -95,4 +95,4 @@ jobs:
       if: github.event_name != 'pull_request'
       run: |
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u hseeberger --password-stdin
-        docker buildx push ${{ steps.create_docker_tag.outputs.TAG }}
+        docker push ${{ steps.create_docker_tag.outputs.TAG }}
