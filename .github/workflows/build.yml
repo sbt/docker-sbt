@@ -53,6 +53,7 @@ jobs:
       run: |
         TAG=hseeberger/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo ::set-output name=TAG::$TAG
+    - run: docker buildx ls
     - name: Build docker image
       run: |
         docker build ${{ matrix.dockerContext }} \
