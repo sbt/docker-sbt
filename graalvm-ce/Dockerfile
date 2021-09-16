@@ -57,7 +57,7 @@ RUN \
   mkdir -p project && \
   echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
   echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
-  touch project/Dependencies.scala && \
+  echo "// force sbt compiler-bridge download" > project/Dependencies.scala && \
   echo "case object Temp" > Temp.scala && \
   sbt compile && \
   rm -r project && rm build.sbt && rm Temp.scala && rm -r target
