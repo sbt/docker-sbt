@@ -17,23 +17,23 @@ jobs:
     strategy:
       matrix:
         scalaVersion: ['2.12.15', '2.13.6', '3.1.0']
-        javaTag: ['8u302', '11.0.12', '17.0.0', '11.0.12-oraclelinux8', 'graalvm-ce-21.3.0-java17', 'graalvm-ce-21.3.0-java11', 'graalvm-ce-21.2.0-java8']
+        javaTag: ['8u311', '11.0.13', '17.0.1', '11.0.13-oraclelinux8', 'graalvm-ce-21.3.0-java17', 'graalvm-ce-21.3.0-java11', 'graalvm-ce-21.2.0-java8']
         include:
-          - javaTag: '8u302'
+          - javaTag: '8u311'
             dockerContext: 'debian'
-            baseImageTag: '8u302-jdk-buster'
+            baseImageTag: '8u311-jdk-buster'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: '11.0.12'
+          - javaTag: '11.0.13'
             dockerContext: 'debian'
-            baseImageTag: '11.0.12-jdk-buster'
+            baseImageTag: '11.0.13-jdk-buster'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: '17.0.0'
+          - javaTag: '17.0.1'
             dockerContext: 'debian'
-            baseImageTag: '17-jdk-buster'
+            baseImageTag: '17.0.1-jdk-buster'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: '11.0.12-oraclelinux8'
+          - javaTag: '11.0.13-oraclelinux8'
             dockerContext: 'oracle'
-            baseImageTag: '11.0.12-jdk-oraclelinux8'
+            baseImageTag: '11.0.13-jdk-oraclelinux8'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'graalvm-ce-21.3.0-java17'
             dockerContext: 'graalvm-ce'
