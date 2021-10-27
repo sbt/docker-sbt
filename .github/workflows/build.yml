@@ -38,7 +38,7 @@ jobs:
           - javaTag: 'graalvm-ce-21.3.0-java17'
             dockerContext: 'graalvm-ce'
             baseImageTag: 'java17-21.3.0'
-            platforms: 'linux/amd64' # something is broken here for linux/arm64, /usr/local/bin/scala: line 23: /opt/graalvm-ce-java17-21.3.0//bin/java: No such file or directory
+            platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'graalvm-ce-21.3.0-java11'
             dockerContext: 'graalvm-ce'
             baseImageTag: 'java11-21.3.0'
