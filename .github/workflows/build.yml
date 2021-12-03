@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         scalaVersion: ['2.12.15', '2.13.7', '3.1.0']
-        javaTag: ['8u312', '11.0.13', '17.0.1', '11.0.13-oraclelinux8', 'graalvm-ce-21.3.0-java17', 'graalvm-ce-21.3.0-java11', 'graalvm-ce-21.2.0-java8']
+        javaTag: ['8u312', '11.0.13', '17.0.1', '11.0.13-oraclelinux8', 'graalvm-ce-21.3.0-java17', 'graalvm-ce-21.3.0-java11', 'graalvm-ce-21.2.0-java8', 'eclipse-temurin-17.0.1', 'eclipse-temurin-11.0.13', 'eclipse-temurin-8u312']
         include:
           - javaTag: '8u312'
             dockerContext: 'debian'
@@ -47,6 +47,18 @@ jobs:
             dockerContext: 'graalvm-ce'
             baseImageTag: 'java8-21.2.0'
             platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-17.0.1'
+            dockerContext: 'eclipse-temurin'
+            baseImageTag: '17.0.1_12-jdk'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-11.0.13'
+            dockerContext: 'eclipse-temurin'
+            baseImageTag: '11.0.13_8-jdk'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-8u312'
+            dockerContext: 'eclipse-temurin'
+            baseImageTag: '8u312-b07-jdk'
+            platforms: 'linux/amd64,linux/arm64'                                
     steps:
     - uses: actions/checkout@v1
     - name: Set up QEMU
