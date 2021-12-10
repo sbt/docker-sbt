@@ -25,7 +25,7 @@ Alternatively, you can build an image from Dockerfile:
 (debian):
 ```
 docker build \
-  --build-arg BASE_IMAGE_TAG="8u212-b04-jdk-stretch" \
+  --build-arg BASE_IMAGE_TAG="8u312-jdk-buster" \
   --build-arg SBT_VERSION="1.5.6" \
   --build-arg SCALA_VERSION="2.13.7" \
   --build-arg USER_ID=1001 \
@@ -36,7 +36,7 @@ docker build \
 (oraclelinux7):
 ```
 docker build \
-  --build-arg BASE_IMAGE_TAG="11.0.2-jdk-oraclelinux7" \
+  --build-arg BASE_IMAGE_TAG="11.0.13-jdk-oraclelinux8" \
   --build-arg SBT_VERSION="1.5.6" \
   --build-arg SCALA_VERSION="2.13.7" \
   --build-arg USER_ID=1001 \
