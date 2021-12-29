@@ -42,9 +42,10 @@ RUN \
   esac && \
   scala -nocompdaemon test.scala && rm test.scala
 
-# Install rpm for sbt-native-packager
-# see https://github.com/hseeberger/scala-sbt/pull/114
-RUN apt-get update && \
+# Install git and rpm for sbt-native-packager (see https://github.com/hseeberger/scala-sbt/pull/114)
+RUN \
+  apt-get update && \
+  apt-get install git -y && \
   apt-get install rpm -y && \
   rm -rf /var/lib/apt/lists/*
 
