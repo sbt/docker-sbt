@@ -19,14 +19,14 @@ For a list of all available tags see https://hub.docker.com/r/hseeberger/scala-s
 1. Install [Docker](https://www.docker.com)
 2. Pull [automated build](https://hub.docker.com/r/hseeberger/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
-docker pull hseeberger/scala-sbt:8u312_1.6.1_2.13.8
+docker pull hseeberger/scala-sbt:8u312_1.6.2_2.13.8
 ```
 Alternatively, you can build an image from Dockerfile:
 (debian):
 ```
 docker build \
   --build-arg BASE_IMAGE_TAG="8u312-jdk-buster" \
-  --build-arg SBT_VERSION="1.6.1" \
+  --build-arg SBT_VERSION="1.6.2" \
   --build-arg SCALA_VERSION="2.13.8" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
@@ -37,7 +37,7 @@ docker build \
 ```
 docker build \
   --build-arg BASE_IMAGE_TAG="11.0.13-jdk-oraclelinux8" \
-  --build-arg SBT_VERSION="1.6.1" \
+  --build-arg SBT_VERSION="1.6.2" \
   --build-arg SCALA_VERSION="2.13.8" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
@@ -48,21 +48,21 @@ docker build \
 ## Usage ##
 
 ```
-docker run -it --rm hseeberger/scala-sbt:8u312_1.6.1_2.13.8
+docker run -it --rm hseeberger/scala-sbt:8u312_1.6.2_2.13.8
 ```
 
 ### Alternative commands ###
 The container contains `bash`, `scala` and `sbt`.
 
 ```
-docker run -it --rm hseeberger/scala-sbt:8u312_1.6.1_2.13.8 scala
+docker run -it --rm hseeberger/scala-sbt:8u312_1.6.2_2.13.8 scala
 ```
 
 ### Non-root ###
 The container is prepared to be used with a non-root user called `sbtuser`
 
 ```
-docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt:8u312_1.6.1_2.13.8
+docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt:8u312_1.6.2_2.13.8
 ```
 
 ## Contribution policy ##
