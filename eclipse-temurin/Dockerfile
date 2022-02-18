@@ -6,7 +6,7 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM eclipse-temurin:${BASE_IMAGE_TAG:-11.0.13_8-jdk}
+FROM eclipse-temurin:${BASE_IMAGE_TAG:-11.0.14.1_1-jdk}
 
 # Env variables
 ARG SCALA_VERSION
