@@ -7,7 +7,9 @@ This repository contains **Dockerfile** of [Scala](http://www.scala-lang.org) an
 
 As we think referencing unstable versions is a bad idea we don't publish a `latest` tag
 
-For a list of all available tags see https://hub.docker.com/r/hseeberger/scala-sbt/tags
+For a list of all available tags see https://hub.docker.com/repository/docker/sbtscala/scala-sbt/tags
+
+Older tags are available at: https://hub.docker.com/r/hseeberger/scala-sbt/tags
 
 ## Base Docker Image ##
 
@@ -17,9 +19,9 @@ For a list of all available tags see https://hub.docker.com/r/hseeberger/scala-s
 ## Installation ##
 
 1. Install [Docker](https://www.docker.com)
-2. Pull [automated build](https://hub.docker.com/r/hseeberger/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
+2. Pull [automated build](https://hub.docker.com/r/sbtscala/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
-docker pull hseeberger/scala-sbt:8u322_1.6.2_2.13.8
+docker pull sbtscala/scala-sbt:8u322_1.6.2_2.13.8
 ```
 Alternatively, you can build an image from Dockerfile:
 (debian):
@@ -30,8 +32,8 @@ docker build \
   --build-arg SCALA_VERSION="2.13.8" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
-  -t hseeberger/scala-sbt \
-  github.com/hseeberger/scala-sbt.git#:debian
+  -t sbtscala/scala-sbt \
+  github.com/sbt/docker-sbt.git#:debian
 ```
 (oraclelinux7):
 ```
@@ -41,28 +43,28 @@ docker build \
   --build-arg SCALA_VERSION="2.13.8" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
-  -t hseeberger/scala-sbt \
-  github.com/hseeberger/scala-sbt.git#:oracle
+  -t sbtscala/scala-sbt \
+  github.com/sbt/docker-sbt.git#:oracle
 ```
 
 ## Usage ##
 
 ```
-docker run -it --rm hseeberger/scala-sbt:8u322_1.6.2_2.13.8
+docker run -it --rm sbtscala/scala-sbt:8u322_1.6.2_2.13.8
 ```
 
 ### Alternative commands ###
 The container contains `bash`, `scala` and `sbt`.
 
 ```
-docker run -it --rm hseeberger/scala-sbt:8u322_1.6.2_2.13.8 scala
+docker run -it --rm sbtscala/scala-sbt:8u322_1.6.2_2.13.8 scala
 ```
 
 ### Non-root ###
 The container is prepared to be used with a non-root user called `sbtuser`
 
 ```
-docker run -it --rm -u sbtuser -w /home/sbtuser hseeberger/scala-sbt:8u322_1.6.2_2.13.8
+docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:8u322_1.6.2_2.13.8
 ```
 
 ## Contribution policy ##

@@ -78,7 +78,7 @@ jobs:
     - name: Create docker tag
       id: create_docker_tag
       run: |
-        TAG=hseeberger/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
+        TAG=sbtscala/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo ::set-output name=TAG::$TAG
     - name: Build docker image
       run: |
