@@ -20,6 +20,9 @@ ENV GROUP_ID ${GROUP_ID:-1001}
 
 # Install sbt
 RUN \
+  apt-get update; apt-get install curl
+
+RUN \
   curl -fsL "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \
   chown -R root:root /usr/share/sbt && \
   chmod -R 755 /usr/share/sbt && \
