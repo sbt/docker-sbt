@@ -105,7 +105,7 @@ jobs:
     - name: Log in to DockerHub
       if: github.event_name != 'pull_request'
       run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u hseeberger --password-stdin
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u francisdb --password-stdin
     - name: Rebuild and push ${{ matrix.platforms }} docker images
       if: github.event_name != 'pull_request'
       run: |
