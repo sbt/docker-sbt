@@ -78,7 +78,7 @@ jobs:
     - name: Create docker tag
       id: create_docker_tag
       run: |
-        TAG=hseeberger/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
+        TAG=sbtscala/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo ::set-output name=TAG::$TAG
     - name: Build docker image
       run: |
@@ -105,7 +105,7 @@ jobs:
     - name: Log in to DockerHub
       if: github.event_name != 'pull_request'
       run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u hseeberger --password-stdin
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u francisdb --password-stdin
     - name: Rebuild and push ${{ matrix.platforms }} docker images
       if: github.event_name != 'pull_request'
       run: |

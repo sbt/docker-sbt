@@ -1,7 +1,7 @@
 #
 # Scala and sbt Dockerfile
 #
-# https://github.com/hseeberger/scala-sbt
+# https://github.com/sbt/docker-sbt
 #
 
 # Pull base image
@@ -43,7 +43,7 @@ RUN \
   scala -nocompdaemon test.scala && rm test.scala
 
 # Install rpm for sbt-native-packager
-# see https://github.com/hseeberger/scala-sbt/pull/114
+# see https://github.com/sbt/docker-sbt/pull/114
 RUN apt-get update && \
   apt-get install rpm -y && \
   rm -rf /var/lib/apt/lists/*
