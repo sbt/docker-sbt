@@ -6,7 +6,7 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM openjdk:${BASE_IMAGE_TAG:-8u322-jdk-bullseye}
+FROM openjdk:${BASE_IMAGE_TAG:-8u332-jdk-buster}
 
 # Env variables
 ARG SCALA_VERSION
