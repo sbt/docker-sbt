@@ -27,7 +27,7 @@ Alternatively, you can build an image from Dockerfile:
 (debian):
 ```
 docker build \
-  --build-arg BASE_IMAGE_TAG="8u332-jdk-buster" \
+  --build-arg BASE_IMAGE_TAG="8u332-jdk-bullseye" \
   --build-arg SBT_VERSION="1.6.2" \
   --build-arg SCALA_VERSION="2.13.8" \
   --build-arg USER_ID=1001 \
