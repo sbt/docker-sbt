@@ -39,7 +39,7 @@ RUN \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/* /usr/local/bin && \
   case $SCALA_VERSION in \
-    "3"*) echo "@main def main = println(util.Properties.versionMsg)" > test.scala ;; \
+    "3"*) echo '@main def main = println(s"Scala library version ${dotty.tools.dotc.config.Properties.versionNumberString}")' > test.scala ;; \
     *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
   esac && \
   scala -nocompdaemon test.scala && rm test.scala
