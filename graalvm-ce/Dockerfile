@@ -6,7 +6,7 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM ghcr.io/graalvm/graalvm-ce:${BASE_IMAGE_TAG:-java11-21.0.0}
+FROM ghcr.io/graalvm/graalvm-ce:${BASE_IMAGE_TAG:-java11-21.3.0}
 
 # Env variables
 ARG SCALA_VERSION
