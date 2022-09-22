@@ -1,59 +1,62 @@
 # Scala and sbt Dockerfile
 
-This repository contains **Dockerfile** of [Scala](http://www.scala-lang.org) and [sbt](http://www.scala-sbt.org).
+This repository provides [Scala](http://www.scala-lang.org) and [sbt](http://www.scala-sbt.org) Docker files and images.
 
+As we think referencing unstable versions is a bad idea we don't publish a `latest` tag. Our tags consists of three parts: `<JDK version>_<sbt version>_<Scala version>`.
 
-## DockerHub
+Images are updated daily
 
-As we think referencing unstable versions is a bad idea we don't publish a `latest` tag
+Available JDK base images:
+* eclipse-temurin - recommended
+* openjdk - [deprecated](https://hub.docker.com/_/openjdk?tab=description)
+* openjdk-oracle
+* graalvm-ce
+
+## Where to get images
+
+The images are published at [Docker Hub](https://hub.docker.com/u/sbtscala)
 
 For a list of all available tags see https://hub.docker.com/r/sbtscala/scala-sbt/tags
 
 Older tags are available at: https://hub.docker.com/r/hseeberger/scala-sbt/tags
-
-## Base Docker Image ##
-
-* [openjdk](https://hub.docker.com/_/openjdk)
-
 
 ## Installation ##
 
 1. Install [Docker](https://www.docker.com)
 2. Pull [automated build](https://hub.docker.com/r/sbtscala/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
-docker pull sbtscala/scala-sbt:17.0.2_1.6.2_3.1.3
+docker pull sbtscala/scala-sbt:eclipse-temurin-17.0.4__3.2.0
 ```
-Alternatively, you can build an image from Dockerfile:
-(debian):
+Alternatively, you can build an image from the remote Dockerfile:
 ```
 docker build \
-  --build-arg BASE_IMAGE_TAG="17.0.2-jdk-bullseye" \
-  --build-arg SBT_VERSION="1.6.2" \
-  --build-arg SCALA_VERSION="2.13.8" \
+  --build-arg BASE_IMAGE_TAG="17.0.4.1_1-jdk" \
+  --build-arg SBT_VERSION="1.7.1" \
+  --build-arg SCALA_VERSION="3.2.0" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
   -t sbtscala/scala-sbt \
-  github.com/sbt/docker-sbt.git#:debian
+  "github.com/sbt/docker-sbt.git#:eclipse-temurin"
 ```
 
 ## Usage ##
 
 ```
-docker run -it --rm sbtscala/scala-sbt:17.0.2_1.6.2_3.1.3
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-17.0.4__3.2.0
 ```
 
 ### Alternative commands ###
 The container contains `bash`, `scala` and `sbt`.
 
 ```
-docker run -it --rm sbtscala/scala-sbt:17.0.2_1.6.2_3.1.3 scala
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-17.0.4__3.2.0 scala
 ```
 
 ### Non-root ###
 The container is prepared to be used with a non-root user called `sbtuser`
 
 ```
-docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:17.0.2_1.6.2_3.1.3
+docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-17.0.4__3.2.0
 ```
 
 ## Contribution policy ##
