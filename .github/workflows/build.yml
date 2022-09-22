@@ -18,38 +18,38 @@ jobs:
       matrix:
         scalaVersion: ['2.12.16', '2.13.9', '3.2.0']
         javaTag: [
-          '8u332',
-          '11.0.15',
+          '8u342',
+          '11.0.16',
           '17.0.2',
-          '18.0.1.1',
-          '11.0.14.1-oraclelinux8',
+          '18.0.2.1',
+          '11.0.16-oraclelinux8',
           'graalvm-ce-21.3.0-java17',
           'graalvm-ce-21.3.0-java11',
           'graalvm-ce-21.2.0-java8',
-          'eclipse-temurin-18.0.1',
-          'eclipse-temurin-17.0.3',
-          'eclipse-temurin-11.0.15'
+          'eclipse-temurin-18.0.2',
+          'eclipse-temurin-17.0.4',
+          'eclipse-temurin-11.0.16'
         ]
         include:
-          - javaTag: '8u332'
+          - javaTag: '8u342'
             dockerContext: 'debian'
-            baseImageTag: '8u332-jdk-bullseye'
+            baseImageTag: '8u342-jdk-bullseye'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: '11.0.15'
+          - javaTag: '11.0.16'
             dockerContext: 'debian'
-            baseImageTag: '11.0.15-jdk-bullseye'
+            baseImageTag: '11.0.16-jdk-bullseye'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: '17.0.2'
             dockerContext: 'debian'
             baseImageTag: '17.0.2-jdk-bullseye'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: '18.0.1.1'
+          - javaTag: '18.0.2.1'
             dockerContext: 'debian'
-            baseImageTag: '18.0.1.1-jdk-bullseye'
+            baseImageTag: '18.0.2.1-jdk-bullseye'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: '11.0.14.1-oraclelinux8'
+          - javaTag: '11.0.16-oraclelinux8'
             dockerContext: 'oracle'
-            baseImageTag: '11.0.14.1-jdk-oraclelinux8'
+            baseImageTag: '11.0.16-jdk-oraclelinux8'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'graalvm-ce-21.3.0-java17'
             dockerContext: 'graalvm-ce'
@@ -63,17 +63,17 @@ jobs:
             dockerContext: 'graalvm-ce'
             baseImageTag: 'java8-21.2.0'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-18.0.1'
+          - javaTag: 'eclipse-temurin-18.0.2'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '18.0.1_10-jdk'
+            baseImageTag: '18.0.2.1_1-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-17.0.3'
+          - javaTag: 'eclipse-temurin-17.0.4'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '17.0.3_7-jdk'
+            baseImageTag: '17.0.4.1_1-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-11.0.15'
+          - javaTag: 'eclipse-temurin-11.0.16'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '11.0.15_10-jdk'
+            baseImageTag: '11.0.16.1_1-jdk'
             platforms: 'linux/amd64,linux/arm64'
     steps:
     - uses: actions/checkout@v1
