@@ -22,7 +22,7 @@ jobs:
           'openjdk-11.0.16',
           'openjdk-17.0.2',
           'openjdk-18.0.2.1',
-          'openjdk-11.0.16-oraclelinux8',
+          'openjdk-oraclelinux8-11.0.16',
           'graalvm-ce-21.3.0-java17',
           'graalvm-ce-21.3.0-java11',
           'graalvm-ce-21.2.0-java8',
@@ -47,7 +47,7 @@ jobs:
             dockerContext: 'openjdk'
             baseImageTag: '18.0.2.1-jdk-bullseye'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'openjdk-11.0.16-oraclelinux8'
+          - javaTag: 'openjdk-oraclelinux8-11.0.16'
             dockerContext: 'openjdk-oracle'
             baseImageTag: '11.0.16-jdk-oraclelinux8'
             platforms: 'linux/amd64,linux/arm64'
