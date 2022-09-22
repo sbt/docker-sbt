@@ -90,10 +90,11 @@ jobs:
       id: get_sbt_version
       run: |
         SBT_VERSION=$(
-          curl -s curl -L https://github.com/sbt/sbt/releases |
-          grep -i -w 'sbt-[0-9]*\.[0-9]*\.[0-9]*\.tgz' -o |
-          grep -i -w '[0-9]*\.[0-9]*\.[0-9]*' -o |
-          sort -V | tail -n 1)
+          curl --silent -L https://github.com/sbt/sbt/releases |
+          grep -i -w -o '>[0-9]*\.[0-9]*\.[0-9]*</a>' |
+          grep -i -w -o '[0-9]*\.[0-9]*\.[0-9]*' |
+          sort --version-sort | tail -n 1)
+        [[ -z "$SBT_VERSION" ]] && { echo "Failed to get latest sbt version" ; exit 1; }
         echo ::set-output name=VERSION::$SBT_VERSION
     - name: Create docker tag
       id: create_docker_tag
