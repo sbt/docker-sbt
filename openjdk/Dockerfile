@@ -70,6 +70,7 @@ RUN \
 # This allows users of this container to choose, whether they want to run the container as sbtuser (non-root) or as root
 USER root
 RUN \
+  rm -rf /tmp/..?* /tmp/.[!.]* * && \
   ln -s /home/sbtuser/.cache /root/.cache && \
   ln -s /home/sbtuser/.sbt /root/.sbt && \
   if [ -d "/home/sbtuser/.ivy2" ]; then ln -s /home/sbtuser/.ivy2 /root/.ivy2; fi
