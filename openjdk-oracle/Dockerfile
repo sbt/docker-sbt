@@ -10,12 +10,12 @@ FROM openjdk:${BASE_IMAGE_TAG:-11.0.16-jdk-oraclelinux8}
 
 # Env variables
 ARG SCALA_VERSION
-ENV SCALA_VERSION ${SCALA_VERSION:-2.13.8}
+ENV SCALA_VERSION ${SCALA_VERSION:-2.13.9}
 ARG SBT_VERSION
 ENV SBT_VERSION ${SBT_VERSION:-1.6.2}
 ARG USER_ID
 ENV USER_ID ${USER_ID:-1001}
-ARG GROUP_ID 
+ARG GROUP_ID
 ENV GROUP_ID ${GROUP_ID:-1001}
 
 # Install sbt
@@ -48,7 +48,7 @@ RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID s
 USER sbtuser
 
 # Switch working directory
-WORKDIR /home/sbtuser  
+WORKDIR /home/sbtuser
 
 # Prepare sbt (warm cache)
 RUN \
@@ -74,6 +74,6 @@ RUN \
 ## Users wanting to use this container as non-root should combine the two following arguments
 ## -u sbtuser
 ## -w /home/sbtuser
-WORKDIR /root  
+WORKDIR /root
 
 CMD sbt
