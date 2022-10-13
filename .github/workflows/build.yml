@@ -130,8 +130,10 @@ jobs:
           sbt about
     - name: Log in to DockerHub
       if: github.event_name != 'pull_request'
-      run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u francisdb --password-stdin
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Rebuild and push ${{ matrix.platforms }} docker images
       if: github.event_name != 'pull_request'
       run: |
