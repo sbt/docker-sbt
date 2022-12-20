@@ -29,7 +29,7 @@ jobs:
           'eclipse-temurin-19_36',
           'eclipse-temurin-18.0.2.1_1',
           'eclipse-temurin-17.0.4.1_1',
-          'eclipse-temurin-11.0.16.1_1'
+          'eclipse-temurin-11.0.17_8'
         ]
         include:
           - javaTag: 'openjdk-8u342'
@@ -76,9 +76,9 @@ jobs:
             dockerContext: 'eclipse-temurin'
             baseImageTag: '17.0.4.1_1-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-11.0.16.1_1'
+          - javaTag: 'eclipse-temurin-11.0.17_8'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '11.0.16.1_1-jdk'
+            baseImageTag: '11.0.17_8-jdk'
             platforms: 'linux/amd64,linux/arm64'
     steps:
     - uses: actions/checkout@v3
