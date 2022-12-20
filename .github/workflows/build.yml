@@ -28,7 +28,7 @@ jobs:
           'graalvm-ce-21.2.0-java8',
           'eclipse-temurin-19_36',
           'eclipse-temurin-18.0.2.1_1',
-          'eclipse-temurin-17.0.4.1_1',
+          'eclipse-temurin-17.0.5_8',
           'eclipse-temurin-11.0.17_8'
         ]
         include:
@@ -72,9 +72,9 @@ jobs:
             dockerContext: 'eclipse-temurin'
             baseImageTag: '18.0.2.1_1-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-17.0.4.1_1'
+          - javaTag: 'eclipse-temurin-17.0.5_8'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '17.0.4.1_1-jdk'
+            baseImageTag: '17.0.5_8-jdk'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'eclipse-temurin-11.0.17_8'
             dockerContext: 'eclipse-temurin'
