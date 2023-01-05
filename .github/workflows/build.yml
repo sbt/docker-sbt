@@ -18,11 +18,6 @@ jobs:
       matrix:
         scalaVersion: ['2.12.17', '2.13.10', '3.2.1']
         javaTag: [
-          'openjdk-8u342',
-          'openjdk-11.0.16',
-          'openjdk-17.0.2',
-          'openjdk-18.0.2.1',
-          'openjdk-oraclelinux8-11.0.16',
           'graalvm-ce-22.3.0-b2-java17',
           'graalvm-ce-22.3.0-b2-java11',
           'eclipse-temurin-19.0.1_10',
@@ -31,27 +26,7 @@ jobs:
           'eclipse-temurin-11.0.17_8'
         ]
         include:
-          - javaTag: 'openjdk-8u342'
-            dockerContext: 'openjdk'
-            baseImageTag: '8u342-jdk-bullseye'
-            platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'openjdk-11.0.16'
-            dockerContext: 'openjdk'
-            baseImageTag: '11.0.16-jdk-bullseye'
-            platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'openjdk-17.0.2'
-            dockerContext: 'openjdk'
-            baseImageTag: '17.0.2-jdk-bullseye'
-            platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'openjdk-18.0.2.1'
-            dockerContext: 'openjdk'
-            baseImageTag: '18.0.2.1-jdk-bullseye'
-            platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'openjdk-oraclelinux8-11.0.16'
-            dockerContext: 'openjdk-oracle'
-            baseImageTag: '11.0.16-jdk-oraclelinux8'
-            platforms: 'linux/amd64,linux/arm64'
-            # https://github.com/graalvm/container/pkgs/container/graalvm-ce
+          # https://github.com/graalvm/container/pkgs/container/graalvm-ce
           - javaTag: 'graalvm-ce-22.3.0-b2-java17'
             dockerContext: 'graalvm-ce'
             baseImageTag: 'ol9-java17-22.3.0-b2'
@@ -60,6 +35,7 @@ jobs:
             dockerContext: 'graalvm-ce'
             baseImageTag: 'ol9-java11-22.3.0-b2'
             platforms: 'linux/amd64'
+          # https://hub.docker.com/_/eclipse-temurin/tags
           - javaTag: 'eclipse-temurin-19.0.1_10'
             dockerContext: 'eclipse-temurin'
             baseImageTag: '19.0.1_10-jdk-jammy'
