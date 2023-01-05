@@ -23,9 +23,8 @@ jobs:
           'openjdk-17.0.2',
           'openjdk-18.0.2.1',
           'openjdk-oraclelinux8-11.0.16',
-          'graalvm-ce-21.3.0-java17',
-          'graalvm-ce-21.3.0-java11',
-          'graalvm-ce-21.2.0-java8',
+          'graalvm-ce-22.3.0-b2-java17',
+          'graalvm-ce-22.3.0-b2-java11',
           'eclipse-temurin-19.0.1_10',
           'eclipse-temurin-18.0.2.1_1',
           'eclipse-temurin-17.0.5_8',
@@ -52,17 +51,14 @@ jobs:
             dockerContext: 'openjdk-oracle'
             baseImageTag: '11.0.16-jdk-oraclelinux8'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'graalvm-ce-21.3.0-java17'
+            # https://github.com/graalvm/container/pkgs/container/graalvm-ce
+          - javaTag: 'graalvm-ce-22.3.0-b2-java17'
             dockerContext: 'graalvm-ce'
-            baseImageTag: 'java17-21.3.0'
+            baseImageTag: 'ol9-java17-22.3.0-b2'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'graalvm-ce-21.3.0-java11'
+          - javaTag: 'graalvm-ce-22.3.0-b2-java11'
             dockerContext: 'graalvm-ce'
-            baseImageTag: 'java11-21.3.0'
-            platforms: 'linux/amd64'
-          - javaTag: 'graalvm-ce-21.2.0-java8'
-            dockerContext: 'graalvm-ce'
-            baseImageTag: 'java8-21.2.0'
+            baseImageTag: 'ol9-java11-22.3.0-b2'
             platforms: 'linux/amd64'
           - javaTag: 'eclipse-temurin-19.0.1_10'
             dockerContext: 'eclipse-temurin'
