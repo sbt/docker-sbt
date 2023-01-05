@@ -7,9 +7,7 @@ As we think referencing unstable versions is a bad idea we don't publish a `late
 Images are updated daily
 
 Available JDK base images:
-* eclipse-temurin - recommended
-* openjdk - [deprecated](https://hub.docker.com/_/openjdk?tab=description)
-* openjdk-oraclelinux8
+* eclipse-temurin
 * graalvm-ce
 
 ## Where to get images
