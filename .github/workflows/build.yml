@@ -20,10 +20,12 @@ jobs:
         javaTag: [
           'graalvm-ce-22.3.0-b2-java17',
           'graalvm-ce-22.3.0-b2-java11',
-          'eclipse-temurin-19.0.1_10',
-          'eclipse-temurin-17.0.5_8',
-          'eclipse-temurin-11.0.17_8',
-          'eclipse-temurin-8u352-b08'
+          'eclipse-temurin-jammy-19.0.1_10',
+          'eclipse-temurin-jammy-17.0.5_8',
+          'eclipse-temurin-jammy-11.0.17_8',
+          'eclipse-temurin-jammy-8u352-b08',
+          'eclipse-temurin-focal-17.0.5_8',
+          'eclipse-temurin-focal-11.0.17_8',
         ]
         include:
           # https://github.com/graalvm/container/pkgs/container/graalvm-ce
@@ -36,21 +38,29 @@ jobs:
             baseImageTag: 'ol9-java11-22.3.0-b2'
             platforms: 'linux/amd64'
           # https://hub.docker.com/_/eclipse-temurin/tags
-          - javaTag: 'eclipse-temurin-19.0.1_10'
+          - javaTag: 'eclipse-temurin-jammy-19.0.1_10'
             dockerContext: 'eclipse-temurin'
             baseImageTag: '19.0.1_10-jdk-jammy'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-17.0.5_8'
+          - javaTag: 'eclipse-temurin-jammy-17.0.5_8'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '17.0.5_8-jdk'
+            baseImageTag: '17.0.5_8-jdk-jammy'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-11.0.17_8'
+          - javaTag: 'eclipse-temurin-jammy-11.0.17_8'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '11.0.17_8-jdk'
+            baseImageTag: '11.0.17_8-jdk-jammy'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-8u352-b08'
+          - javaTag: 'eclipse-temurin-jammy-8u352-b08'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '8u352-b08-jdk'
+            baseImageTag: '8u352-b08-jdk-jammy'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-focal-17.0.5_8'
+            dockerContext: 'eclipse-temurin'
+            baseImageTag: '17.0.5_8-jdk-focal'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-focal-11.0.17_8'
+            dockerContext: 'eclipse-temurin'
+            baseImageTag: '11.0.17_8-jdk-focal'
             platforms: 'linux/amd64,linux/arm64'
     steps:
     - uses: actions/checkout@v3
