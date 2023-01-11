@@ -82,12 +82,12 @@ jobs:
           grep -i -w -o '[0-9]*\.[0-9]*\.[0-9]*' |
           sort --version-sort | tail -n 1)
         [[ -z "$SBT_VERSION" ]] && { echo "Failed to get latest sbt version" ; exit 1; }
-        echo ::set-output name=VERSION::$SBT_VERSION
+        echo "VERSION=$SBT_VERSION" >> $GITHUB_OUTPUT
     - name: Create docker tag
       id: create_docker_tag
       run: |
         TAG=sbtscala/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
-        echo ::set-output name=TAG::$TAG
+        echo "TAG=$TAG" >> $GITHUB_OUTPUT
     - name: Build docker image
       run: |
         docker build ${{ matrix.dockerContext }} \
