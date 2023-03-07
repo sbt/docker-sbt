@@ -89,13 +89,16 @@ jobs:
         TAG=sbtscala/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo "TAG=$TAG" >> $GITHUB_OUTPUT
     - name: Build docker image
-      run: |
-        docker build ${{ matrix.dockerContext }} \
-            --no-cache \
-            -t "${{ steps.create_docker_tag.outputs.TAG }}" \
-            --build-arg BASE_IMAGE_TAG=${{ matrix.baseImageTag }} \
-            --build-arg SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }} \
-            --build-arg SCALA_VERSION=${{ matrix.scalaVersion }}
+      uses: docker/build-push-action@v4
+      with:
+        context: ${{ matrix.dockerContext }}
+        no-cache: true
+        tags: ${{ steps.create_docker_tag.outputs.TAG }}
+        build-args: |
+          BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
+          SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }}
+          SCALA_VERSION=${{ matrix.scalaVersion }}
+        load: true
     - name: Test docker image as root (default)
       if: ${{ !startsWith(matrix.scalaVersion, '2.12') }}
       # scala --version does not work on < 2.13
@@ -118,12 +121,13 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Rebuild and push ${{ matrix.platforms }} docker images
       if: github.event_name != 'pull_request'
-      run: |
-        docker buildx build ${{ matrix.dockerContext }} \
-            --no-cache \
-            -t "${{ steps.create_docker_tag.outputs.TAG }}" \
-            --build-arg BASE_IMAGE_TAG=${{ matrix.baseImageTag }} \
-            --build-arg SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }} \
-            --build-arg SCALA_VERSION=${{ matrix.scalaVersion }} \
-            --platform ${{ matrix.platforms }} \
-            --push
+      uses: docker/build-push-action@v4
+      with:
+        context: ${{ matrix.dockerContext }}
+        tags: ${{ steps.create_docker_tag.outputs.TAG }}
+        build-args: |
+          BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
+          SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }}
+          SCALA_VERSION=${{ matrix.scalaVersion }}
+        platforms: ${{ matrix.platforms }}
+        push: true
