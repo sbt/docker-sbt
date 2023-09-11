@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scalaVersion: ['2.12.18', '2.13.11', '3.3.0']
+        scalaVersion: ['2.12.18', '2.13.12', '3.3.1']
         javaTag: [
           'graalvm-ce-22.3.0-b2-java17',
           'graalvm-ce-22.3.0-b2-java11',
