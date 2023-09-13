@@ -9,6 +9,7 @@ Images are updated daily
 Available JDK base images:
 * eclipse-temurin
 * graalvm-ce
+* amazoncorretto
 
 ## Where to get images
 
