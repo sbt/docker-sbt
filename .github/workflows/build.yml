@@ -20,7 +20,7 @@ jobs:
         javaTag: [
           'graalvm-ce-22.3.3-b1-java17',
           'graalvm-ce-22.3.3-b1-java11',
-          'eclipse-temurin-jammy-20.0.2_9',
+          'eclipse-temurin-jammy-21_35',
           'eclipse-temurin-jammy-17.0.8.1_1',
           'eclipse-temurin-jammy-11.0.20.1_1',
           'eclipse-temurin-jammy-8u382-b05',
@@ -38,9 +38,9 @@ jobs:
             baseImageTag: 'ol9-java11-22.3.3-b1'
             platforms: 'linux/amd64'
           # https://hub.docker.com/_/eclipse-temurin/tags
-          - javaTag: 'eclipse-temurin-jammy-20.0.2_9'
+          - javaTag: 'eclipse-temurin-jammy-21_35'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '20.0.2_9-jdk-jammy'
+            baseImageTag: '21_35-jdk-jammy'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'eclipse-temurin-jammy-17.0.8.1_1'
             dockerContext: 'eclipse-temurin'
