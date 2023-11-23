@@ -18,7 +18,7 @@ jobs:
       matrix:
         scalaVersion: ['2.12.18', '2.13.12', '3.3.1']
         javaTag: [
-          'graalvm-community-21.0.1'
+          'graalvm-community-21.0.1',
           'graalvm-ce-22.3.3-b1-java17',
           'graalvm-ce-22.3.3-b1-java11',
           'eclipse-temurin-jammy-21.0.1_12',
