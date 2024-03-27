@@ -27,6 +27,9 @@ jobs:
           'eclipse-temurin-jammy-8u402-b06',
           'eclipse-temurin-focal-17.0.10_7',
           'eclipse-temurin-focal-11.0.22_7',
+          'eclipse-temurin-alpine-21.0.2_13',
+          'eclipse-temurin-alpine-17.0.10_7',
+          'eclipse-temurin-alpine-11.0.22_7',
         ]
         include:
           # https://github.com/graalvm/container/pkgs/container/graalvm-community
@@ -68,6 +71,21 @@ jobs:
             dockerContext: 'eclipse-temurin'
             baseImageTag: '11.0.22_7-jdk-focal'
             platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-alpine-21.0.2_13'
+            dockerContext: 'eclipse-temurin'
+            dockerfile: 'alpine.Dockerfile'
+            baseImageTag: '21.0.2_13-jdk-alpine'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-alpine-17.0.10_7'
+            dockerContext: 'eclipse-temurin'
+            dockerfile: 'alpine.Dockerfile'
+            baseImageTag: '17.0.10_7-jdk-alpine'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'eclipse-temurin-alpine-11.0.22_7'
+            dockerContext: 'eclipse-temurin'
+            dockerfile: 'alpine.Dockerfile'
+            baseImageTag: '11.0.22_7-jdk-alpine'
+            platforms: 'linux/amd64,linux/arm64'
     steps:
     - uses: actions/checkout@v4
     - name: Set up QEMU
@@ -100,6 +118,7 @@ jobs:
         context: ${{ matrix.dockerContext }}
         no-cache: true
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
+        dockerfile: ${{ matrix.dockerfile }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
           SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }}
@@ -130,6 +149,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ${{ matrix.dockerContext }}
+        dockerfile: ${{ matrix.dockerfile }}
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
