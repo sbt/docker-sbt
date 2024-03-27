@@ -16,7 +16,6 @@ RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash c
     esac && \
     curl -fsL $URL | tar xfz - -C /usr/share && \
     mv /usr/share/$SCALA_DIR $SCALA_HOME && \
-    rm "/tmp/$SCALA_DIR/bin/"*.bat && \
     ln -s "$SCALA_HOME/bin/"* "/usr/bin/" && \
     update-ca-certificates && \
     scala -version && \
@@ -24,7 +23,7 @@ RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash c
       "3"*) echo '@main def main = println(s"Scala library version ${dotty.tools.dotc.config.Properties.versionNumberString}")' > test.scala ;; \
       *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
     esac && \
-    scala -nocompdaemon test.scala && rm test.scala && 
+    scala -nocompdaemon test.scala && rm test.scala
 
 RUN \
     curl -fsL https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar xfz - -C /usr/local && \
@@ -38,6 +37,11 @@ RUN \
 # Start a new stage for the final image
 FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk}-alpine
 
+ARG SCALA_VERSION=3.4.0
+ARG SBT_VERSION=1.9.9
+ARG USER_ID=1001
+ARG GROUP_ID=1001
+
 RUN apk add --no-cache bash git rpm
 
 COPY --from=builder /usr/share/scala /usr/share/scala
@@ -45,7 +49,7 @@ COPY --from=builder /usr/local/sbt /usr/local/sbt
 COPY --from=builder /usr/local/bin/sbt /usr/local/bin/sbt
 
 # Add and use user sbtuser
-RUN addgroup -g $GROUP_ID sbtuser && adduser -D -G sbtuser -u $USER_ID sbtuser
+RUN addgroup -g $GROUP_ID sbtuser && adduser -D -u $USER_ID -G sbtuser sbtuser
 USER sbtuser
 
 # Switch working directory
@@ -53,12 +57,12 @@ WORKDIR /home/sbtuser
 
 # Prepare sbt (warm cache)
 RUN \
-  sbt sbtVersion && \
   mkdir -p project && \
   echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
   echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
   echo "// force sbt compiler-bridge download" > project/Dependencies.scala && \
   echo "case object Temp" > Temp.scala && \
+  sbt sbtVersion && \
   sbt compile && \
   rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 
