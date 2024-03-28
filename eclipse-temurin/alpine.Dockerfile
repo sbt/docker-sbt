@@ -55,6 +55,8 @@ USER sbtuser
 # Switch working directory
 WORKDIR /home/sbtuser
 
+ENV PATH="/usr/share/scala/bin:${PATH}"
+
 # Prepare sbt (warm cache)
 RUN \
   mkdir -p project && \
