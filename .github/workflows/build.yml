@@ -118,7 +118,7 @@ jobs:
         context: ${{ matrix.dockerContext }}
         no-cache: true
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
-        file: ${{ matrix.dockerfile || 'Dockerfile' }}
+        file: ${{ matrix.dockerContext }}/${{ matrix.dockerfile || 'Dockerfile' }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
           SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }}
@@ -149,7 +149,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ${{ matrix.dockerContext }}
-        file: ${{ matrix.dockerfile || 'Dockerfile' }}
+        file: ${{ matrix.dockerContext }}/${{ matrix.dockerfile || 'Dockerfile' }}
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
