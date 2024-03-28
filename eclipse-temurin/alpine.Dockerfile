@@ -1,5 +1,5 @@
 # Use a multi-stage build to reduce the size of the final image
-FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk} as builder
+FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine} as builder
 
 ARG SCALA_VERSION=3.4.0
 ARG SBT_VERSION=1.9.9
@@ -35,7 +35,7 @@ RUN \
     rm -rf /var/cache/apk/*
 
 # Start a new stage for the final image
-FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk}-alpine
+FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine}
 
 ARG SCALA_VERSION=3.4.0
 ARG SBT_VERSION=1.9.9
