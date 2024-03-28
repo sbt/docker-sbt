@@ -28,8 +28,7 @@ jobs:
           'eclipse-temurin-focal-17.0.10_7',
           'eclipse-temurin-focal-11.0.22_7',
           'eclipse-temurin-alpine-21.0.2_13',
-          'eclipse-temurin-alpine-17.0.10_7',
-          'eclipse-temurin-alpine-11.0.22_7',
+          'eclipse-temurin-alpine-17.0.10_7'
         ]
         include:
           # https://github.com/graalvm/container/pkgs/container/graalvm-community
@@ -80,11 +79,6 @@ jobs:
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '17.0.10_7-jdk-alpine'
-            platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-alpine-11.0.22_7'
-            dockerContext: 'eclipse-temurin'
-            dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '11.0.22_7-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64'
     steps:
     - uses: actions/checkout@v4
