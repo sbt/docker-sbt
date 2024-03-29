@@ -18,6 +18,14 @@ ENV USER_ID ${USER_ID:-1001}
 ARG GROUP_ID
 ENV GROUP_ID ${GROUP_ID:-1001}
 
+# Install dependencies
+# curl for downloading sbt and scala
+# git and rpm for sbt-native-packager (see https://github.com/sbt/docker-sbt/pull/114)
+RUN \
+  apt-get update && \
+  apt-get install -y curl git rpm && \
+  rm -rf /var/lib/apt/lists/*
+
 # Install sbt
 RUN \
   curl -fsL "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \
@@ -41,13 +49,6 @@ RUN \
     *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
   esac && \
   scala -nocompdaemon test.scala && rm test.scala
-
-# Install git and rpm for sbt-native-packager (see https://github.com/sbt/docker-sbt/pull/114)
-RUN \
-  apt-get update && \
-  apt-get install git -y && \
-  apt-get install rpm -y && \
-  rm -rf /var/lib/apt/lists/*
 
 # Symlink java to have it available on sbtuser's PATH
 RUN ln -s /opt/java/openjdk/bin/java /usr/local/bin/java
