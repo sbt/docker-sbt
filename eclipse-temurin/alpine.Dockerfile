@@ -7,8 +7,11 @@ ARG USER_ID=1001
 ARG GROUP_ID=1001
 ENV SCALA_HOME=/usr/share/scala
 
-# Install scala and sbt
-RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash curl bc && \
+# Install dependencies
+RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash curl bc
+
+# Install scala
+RUN \
     cd "/tmp" && \
     case $SCALA_VERSION in \
       "3"*) URL=https://github.com/lampepfl/dotty/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=scala3-$SCALA_VERSION ;; \
@@ -25,6 +28,7 @@ RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash c
     esac && \
     scala -nocompdaemon test.scala && rm test.scala
 
+# Install sbt
 RUN \
     curl -fsL https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar xfz - -C /usr/local && \
     $(mv /usr/local/sbt-launcher-packaging-$SBT_VERSION /usr/local/sbt || true) && \
