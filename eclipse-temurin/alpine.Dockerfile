@@ -1,4 +1,5 @@
 # Use a multi-stage build to reduce the size of the final image
+ARG BASE_IMAGE_TAG
 FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine} as builder
 
 ARG SCALA_VERSION=3.4.0
