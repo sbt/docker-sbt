@@ -71,7 +71,7 @@ jobs:
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '17.0.10_7-jdk-alpine'
-            platforms: 'linux/amd64,linux/arm64'
+            platforms: 'linux/amd64'
     steps:
     - uses: actions/checkout@v4
     - name: Set up QEMU
