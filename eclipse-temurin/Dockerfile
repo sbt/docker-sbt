@@ -71,6 +71,14 @@ RUN \
   sbt compile && \
   rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 
+# Install nodejs
+RUN apt install nodejs
+
+# Install python3 and pip, and pip install pre-commit
+RUN apt install python3
+RUN apt install python3-pip
+RUN pip3 install pre-commit
+
 # Link everything into root as well
 # This allows users of this container to choose, whether they want to run the container as sbtuser (non-root) or as root
 USER root
