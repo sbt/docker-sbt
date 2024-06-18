@@ -99,7 +99,7 @@ jobs:
         TAG=sbtscala/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo "TAG=$TAG" >> $GITHUB_OUTPUT
     - name: Build docker image
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ${{ matrix.dockerContext }}
         no-cache: true
@@ -132,7 +132,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Rebuild and push ${{ matrix.platforms }} docker images
       if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ${{ matrix.dockerContext }}
         file: ${{ matrix.dockerContext }}/${{ matrix.dockerfile || 'Dockerfile' }}
