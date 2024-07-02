@@ -73,7 +73,7 @@ jobs:
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '17.0.10_7-jdk-alpine'
-            platforms: 'linux/amd64,linux/arm64'
+            platforms: 'linux/amd64'
           # https://hub.docker.com/_/amazoncorretto/tags
           - javaTag: 'amazoncorretto-21.0.3'
             dockerContext: 'amazoncorretto'
