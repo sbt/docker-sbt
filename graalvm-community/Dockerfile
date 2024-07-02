@@ -6,25 +6,18 @@
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM eclipse-temurin:${BASE_IMAGE_TAG:-11.0.16.1_1-jdk}
+FROM ghcr.io/graalvm/graalvm-community:${BASE_IMAGE_TAG:-21.0.1-ol9}
 
 # Env variables
 ARG SCALA_VERSION
-ENV SCALA_VERSION ${SCALA_VERSION:-2.13.10}
+ENV SCALA_VERSION ${SCALA_VERSION:-2.13.12}
 ARG SBT_VERSION
-ENV SBT_VERSION ${SBT_VERSION:-1.6.2}
+ENV SBT_VERSION ${SBT_VERSION:-1.9.7}
+ENV JAVA_OPTS -XX:+UseG1GC
 ARG USER_ID
 ENV USER_ID ${USER_ID:-1001}
 ARG GROUP_ID
 ENV GROUP_ID ${GROUP_ID:-1001}
-
-# Install dependencies
-# curl for downloading sbt and scala
-# git and rpm for sbt-native-packager (see https://github.com/sbt/docker-sbt/pull/114)
-RUN \
-  apt-get update && \
-  apt-get install -y curl git rpm && \
-  rm -rf /var/lib/apt/lists/*
 
 # Install sbt
 RUN \
@@ -34,6 +27,7 @@ RUN \
   ln -s /usr/share/sbt/bin/sbt /usr/local/bin/sbt
 
 # Install Scala
+## Piping curl directly in tar
 RUN \
   case $SCALA_VERSION in \
     "3"*) URL=https://github.com/lampepfl/dotty/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION ;; \
@@ -50,11 +44,8 @@ RUN \
   esac && \
   scala -nocompdaemon test.scala && rm test.scala
 
-# Symlink java to have it available on sbtuser's PATH
-RUN ln -s /opt/java/openjdk/bin/java /usr/local/bin/java
-
 # Add and use user sbtuser
-RUN groupadd --gid $GROUP_ID sbtuser && useradd -m --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
+RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
 USER sbtuser
 
 # Switch working directory

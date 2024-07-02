@@ -16,70 +16,80 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scalaVersion: ['2.12.17', '2.13.10', '3.2.2']
+        scalaVersion: ['2.12.19', '2.13.14', '3.3.3', '3.4.2']
         javaTag: [
-          'graalvm-ce-22.3.0-b2-java17',
-          'graalvm-ce-22.3.0-b2-java11',
-          'eclipse-temurin-jammy-19.0.1_10',
-          'eclipse-temurin-jammy-17.0.5_8',
-          'eclipse-temurin-jammy-11.0.17_8',
-          'eclipse-temurin-jammy-8u352-b08',
-          'eclipse-temurin-focal-17.0.5_8',
-          'eclipse-temurin-focal-11.0.17_8',
-          'amazoncorretto-17.0.6',
-          'amazoncorretto-11.0.18'
+          'graalvm-community-22.0.1',
+          'graalvm-community-21.0.2',
+          'graalvm-ce-22.3.3-b1-java17',
+          'eclipse-temurin-jammy-22_36',
+          'eclipse-temurin-jammy-21.0.2_13',
+          'eclipse-temurin-jammy-17.0.10_7',
+          'eclipse-temurin-alpine-22_36',
+          'eclipse-temurin-alpine-21.0.2_13',
+          'eclipse-temurin-alpine-17.0.10_7',
+          'amazoncorretto-21.0.3',
+          'amazoncorretto-17.0.11'
         ]
         include:
+          # https://github.com/graalvm/container/pkgs/container/graalvm-community
+          - javaTag: 'graalvm-community-22.0.1'
+            dockerContext: 'graalvm-community'
+            baseImageTag: '22.0.1-ol9'
+            platforms: 'linux/amd64,linux/arm64'
+          - javaTag: 'graalvm-community-21.0.2'
+            dockerContext: 'graalvm-community'
+            baseImageTag: '21.0.2-ol9'
+            platforms: 'linux/amd64,linux/arm64'
           # https://github.com/graalvm/container/pkgs/container/graalvm-ce
-          - javaTag: 'graalvm-ce-22.3.0-b2-java17'
+          - javaTag: 'graalvm-ce-22.3.3-b1-java17'
             dockerContext: 'graalvm-ce'
-            baseImageTag: 'ol9-java17-22.3.0-b2'
+            baseImageTag: 'ol9-java17-22.3.3-b1'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'graalvm-ce-22.3.0-b2-java11'
-            dockerContext: 'graalvm-ce'
-            baseImageTag: 'ol9-java11-22.3.0-b2'
-            platforms: 'linux/amd64'
           # https://hub.docker.com/_/eclipse-temurin/tags
-          - javaTag: 'eclipse-temurin-jammy-19.0.1_10'
+          - javaTag: 'eclipse-temurin-jammy-22_36'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '19.0.1_10-jdk-jammy'
+            baseImageTag: '22_36-jdk-jammy'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-jammy-17.0.5_8'
+          - javaTag: 'eclipse-temurin-jammy-21.0.2_13'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '17.0.5_8-jdk-jammy'
+            baseImageTag: '21.0.2_13-jdk-jammy'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-jammy-11.0.17_8'
+          - javaTag: 'eclipse-temurin-jammy-17.0.10_7'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '11.0.17_8-jdk-jammy'
+            baseImageTag: '17.0.10_7-jdk-jammy'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-jammy-8u352-b08'
+          # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
+          - javaTag: 'eclipse-temurin-alpine-22_36'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '8u352-b08-jdk-jammy'
-            platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-focal-17.0.5_8'
+            dockerfile: 'alpine.Dockerfile'
+            baseImageTag: '22_36-jdk-alpine'
+            platforms: 'linux/amd64,linux/arm64/v8'
+          - javaTag: 'eclipse-temurin-alpine-21.0.2_13'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '17.0.5_8-jdk-focal'
-            platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-focal-11.0.17_8'
+            dockerfile: 'alpine.Dockerfile'
+            baseImageTag: '21.0.2_13-jdk-alpine'
+            platforms: 'linux/amd64,linux/arm64/v8'
+          - javaTag: 'eclipse-temurin-alpine-17.0.10_7'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '11.0.17_8-jdk-focal'
+            dockerfile: 'alpine.Dockerfile'
+            baseImageTag: '17.0.10_7-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64'
           # https://hub.docker.com/_/amazoncorretto/tags
-          - javaTag: 'amazoncorretto-17.0.6'
+          - javaTag: 'amazoncorretto-21.0.3'
             dockerContext: 'amazoncorretto'
-            baseImageTag: '17.0.6'
+            baseImageTag: '21.0.3'
             platforms: 'linux/amd64'
-          - javaTag: 'amazoncorretto-11.0.18'
+          - javaTag: 'amazoncorretto-17.0.11'
             dockerContext: 'amazoncorretto'
-            baseImageTag: '11.0.18'
+            baseImageTag: '17.0.11'
             platforms: 'linux/amd64'
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2.1.0
+      uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
       id: buildx
-      uses: docker/setup-buildx-action@v2.4.1
+      uses: docker/setup-buildx-action@v3.3.0
       #      with:
       #        install: true
     - name: Available platforms
@@ -100,11 +110,12 @@ jobs:
         TAG=sbtscala/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
         echo "TAG=$TAG" >> $GITHUB_OUTPUT
     - name: Build docker image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v6
       with:
         context: ${{ matrix.dockerContext }}
         no-cache: true
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
+        file: ${{ matrix.dockerContext }}/${{ matrix.dockerfile || 'Dockerfile' }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
           SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }}
@@ -125,16 +136,17 @@ jobs:
           scala --version &&
           sbt about
     - name: Log in to DockerHub
-      if: github.event_name != 'pull_request'
-      uses: docker/login-action@v2
+      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Rebuild and push ${{ matrix.platforms }} docker images
-      if: github.event_name != 'pull_request'
-      uses: docker/build-push-action@v4
+      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+      uses: docker/build-push-action@v6
       with:
         context: ${{ matrix.dockerContext }}
+        file: ${{ matrix.dockerContext }}/${{ matrix.dockerfile || 'Dockerfile' }}
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
