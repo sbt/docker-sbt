@@ -73,10 +73,10 @@ jobs:
             baseImageTag: '17.0.10_7-jdk-alpine'
             platforms: 'linux/amd64'
         exclude:
-#          - scalaVersion: '3.5.0'
-#            javaTag: 'graalvm-community-22.0.1'
-#          - scalaVersion: '3.5.0'
-#            javaTag: 'graalvm-community-21.0.2'
+          - scalaVersion: '3.5.0'
+            javaTag: 'graalvm-community-22.0.1'
+          - scalaVersion: '3.5.0'
+            javaTag: 'graalvm-community-21.0.2'
           # https://github.com/VirtusLab/scala-cli/issues/3130
           - scalaVersion: '3.5.0'
             javaTag: 'graalvm-ce-22.3.3-b1-java17'
