@@ -24,8 +24,8 @@ RUN \
     update-ca-certificates && \
     scala -version && \
     case $SCALA_VERSION in \
-      "3"*) echo '@main def main = println(s"Scala library version ${dotty.tools.dotc.config.Properties.versionNumberString}")' > test.scala ;; \
-      *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
+    "3"*) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
+    *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
     esac && \
     scala -nocompdaemon test.scala && rm test.scala
 
