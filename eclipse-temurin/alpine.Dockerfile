@@ -18,7 +18,7 @@ RUN \
       "3"*) URL=https://github.com/lampepfl/dotty/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=scala3-$SCALA_VERSION ;; \
       *) URL=https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=scala-$SCALA_VERSION ;; \
     esac && \
-    curl -fsL $URL | tar xfz - -C /usr/share && \
+    curl -fsL --show-error $URL | tar xfz - -C /usr/share && \
     mv /usr/share/$SCALA_DIR $SCALA_HOME && \
     ln -s "$SCALA_HOME/bin/"* "/usr/bin/" && \
     update-ca-certificates && \
@@ -31,7 +31,7 @@ RUN \
 
 # Install sbt
 RUN \
-    curl -fsL https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar xfz - -C /usr/local && \
+    curl -fsL --show-error https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar xfz - -C /usr/local && \
     $(mv /usr/local/sbt-launcher-packaging-$SBT_VERSION /usr/local/sbt || true) && \
     ln -s /usr/local/sbt/bin/* /usr/local/bin/ && \
     sbt -Dsbt.rootdir=true -batch sbtVersion && \
