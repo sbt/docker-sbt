@@ -1,6 +1,6 @@
 # Use a multi-stage build to reduce the size of the final image
 ARG BASE_IMAGE_TAG
-FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine} as builder
+FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine} AS builder
 
 ARG SCALA_VERSION=3.4.0
 ARG SBT_VERSION=1.9.9
@@ -88,4 +88,4 @@ RUN \
 ## -w /home/sbtuser
 WORKDIR /root
 
-CMD sbt
+CMD ["sbt"]

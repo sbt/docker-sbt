@@ -88,4 +88,4 @@ RUN \
 ## -w /home/sbtuser
 WORKDIR /root
 
-CMD sbt
+CMD ["sbt"]
