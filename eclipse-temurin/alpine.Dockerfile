@@ -23,13 +23,11 @@ RUN \
     ln -s "$SCALA_HOME/bin/"* "/usr/bin/" && \
     update-ca-certificates && \
     scala -version && \
-    mkdir -p /test && \
     case $SCALA_VERSION in \
-      "3"*) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > /test/test.scala ;; \
-      *) echo "println(util.Properties.versionMsg)" > /test/test.scala ;; \
+    "3"*) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
+    *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
     esac && \
-    scala -nocompdaemon test/test.scala && \
-    rm -fr test
+    scala -nocompdaemon test.scala && rm test.scala
 
 # Install sbt
 RUN \
