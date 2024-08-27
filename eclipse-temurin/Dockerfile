@@ -44,11 +44,13 @@ RUN \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/* /usr/local/bin && \
+  mkdir -p /test && \
   case $SCALA_VERSION in \
-    "3"*) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
-    *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
+    "3"*) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > /test/test.scala ;; \
+    *) echo "println(util.Properties.versionMsg)" > /test/test.scala ;; \
   esac && \
-  scala -nocompdaemon test.scala && rm test.scala
+  scala -nocompdaemon test/test.scala && \
+  rm -fr test
 
 # Symlink java to have it available on sbtuser's PATH
 RUN ln -s /opt/java/openjdk/bin/java /usr/local/bin/java
