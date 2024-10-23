@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scalaVersion: ['2.12.20', '2.13.15', '3.3.4', '3.5.1']
+        scalaVersion: ['2.12.20', '2.13.15', '3.3.4', '3.5.2']
         javaTag: [
           'graalvm-community-22.0.1',
           'graalvm-community-21.0.2',
@@ -74,11 +74,11 @@ jobs:
             platforms: 'linux/amd64'
         exclude:
           # https://github.com/VirtusLab/scala-cli/issues/3130
-          - scalaVersion: '3.5.1'
+          - scalaVersion: '3.5.2'
             javaTag: 'graalvm-community-22.0.1'
-          - scalaVersion: '3.5.1'
+          - scalaVersion: '3.5.2'
             javaTag: 'graalvm-community-21.0.2'
-          - scalaVersion: '3.5.1'
+          - scalaVersion: '3.5.2'
             javaTag: 'graalvm-ce-22.3.3-b1-java17'
           # https://github.com/VirtusLab/scala-cli/issues/2758
           # - scalaVersion: '3.5.0'
