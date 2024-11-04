@@ -62,15 +62,15 @@ jobs:
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '23.0.1_11-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-21.0.2_13'
+          - javaTag: 'eclipse-temurin-alpine-21.0.5_11'
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '21.0.2_13-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-17.0.10_7'
+          - javaTag: 'eclipse-temurin-alpine-17.0.13_11'
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '17.0.10_7-jdk-alpine'
+            baseImageTag: '17.0.13_11-jdk-alpine'
             platforms: 'linux/amd64'
         exclude:
           # https://github.com/VirtusLab/scala-cli/issues/3130
