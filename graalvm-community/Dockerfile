@@ -23,7 +23,6 @@ ENV GROUP_ID=${GROUP_ID:-1001}
 # ps for scala3 https://github.com/VirtusLab/scala-cli/issues/3130
 # git and rpm for sbt-native-packager (see https://github.com/sbt/docker-sbt/pull/114)
 RUN \
-  microdnf -y update && \
   microdnf -y install procps git rpm && \
   rm -rf /var/cache/dnf/* && \
   microdnf clean all
