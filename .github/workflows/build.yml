@@ -26,7 +26,9 @@ jobs:
           'eclipse-temurin-17.0.13_11',
           'eclipse-temurin-alpine-23.0.1_11',
           'eclipse-temurin-alpine-21.0.5_11',
-          'eclipse-temurin-alpine-17.0.13_11'
+          'eclipse-temurin-alpine-17.0.13_11',
+          'amazoncorretto-al2023-21.0.5',
+          'amazoncorretto-al2023-17.0.13'
         ]
         include:
           # https://github.com/graalvm/container/pkgs/container/graalvm-community
@@ -71,6 +73,15 @@ jobs:
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '17.0.13_11-jdk-alpine'
+            platforms: 'linux/amd64'
+          # https://hub.docker.com/_/amazoncorretto/tags
+          - javaTag: 'amazoncorretto-al2023-21.0.5'
+            dockerContext: 'amazoncorretto'
+            baseImageTag: '21.0.5-al2023'
+            platforms: 'linux/amd64'
+          - javaTag: 'amazoncorretto-al2023-17.0.13'
+            dockerContext: 'amazoncorretto'
+            baseImageTag: '17.0.13-al2023'
             platforms: 'linux/amd64'
         exclude:
           # https://github.com/VirtusLab/scala-cli/issues/3130
