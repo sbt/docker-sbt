@@ -83,21 +83,6 @@ jobs:
             dockerContext: 'amazoncorretto'
             baseImageTag: '17.0.13-al2023'
             platforms: 'linux/amd64'
-        exclude:
-          # https://github.com/VirtusLab/scala-cli/issues/3130
-          - scalaVersion: '3.5.2'
-            javaTag: 'graalvm-community-22.0.1'
-          - scalaVersion: '3.5.2'
-            javaTag: 'graalvm-community-21.0.2'
-          - scalaVersion: '3.5.2'
-            javaTag: 'graalvm-ce-22.3.3-b1-java17'
-          # https://github.com/VirtusLab/scala-cli/issues/2758
-          # - scalaVersion: '3.5.0'
-          #   javaTag: 'eclipse-temurin-alpine-22_36'
-          # - scalaVersion: '3.5.0'
-          #   javaTag: 'eclipse-temurin-alpine-21.0.2_13'
-          # - scalaVersion: '3.5.0'
-          #   javaTag: 'eclipse-temurin-alpine-17.0.10_7'
     steps:
     - uses: actions/checkout@v4
     - name: Set up QEMU
