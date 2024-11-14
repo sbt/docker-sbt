@@ -19,6 +19,14 @@ ENV USER_ID=${USER_ID:-1001}
 ARG GROUP_ID
 ENV GROUP_ID=${GROUP_ID:-1001}
 
+# Install dependencies
+# ps for scala3 https://github.com/VirtusLab/scala-cli/issues/3130
+# git and rpm for sbt-native-packager (see https://github.com/sbt/docker-sbt/pull/114)
+RUN \
+  microdnf -y install procps git rpm && \
+  rm -rf /var/cache/dnf/* && \
+  microdnf clean all
+
 # Install sbt
 RUN \
   curl -fsL --show-error "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \
