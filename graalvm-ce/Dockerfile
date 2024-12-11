@@ -38,17 +38,19 @@ RUN \
 ## Piping curl directly in tar
 RUN \
   case $SCALA_VERSION in \
-    "3"*) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION ;; \
-    *) URL=https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=/usr/share/scala-$SCALA_VERSION ;; \
+    2.*) URL=https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=/usr/share/scala-$SCALA_VERSION EXTRACT_DIR=/usr/share ;; \
+    3.[0-5]*) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION EXTRACT_DIR=/usr/share ;; \
+    *) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala-$SCALA_VERSION EXTRACT_DIR=/usr/share/scala-$SCALA_VERSION ;; \
   esac && \
-  curl -fsL --show-error $URL | tar xfz - -C /usr/share && \
+  mkdir -p $EXTRACT_DIR && \
+  curl -fsL --show-error $URL | tar xfz - -C $EXTRACT_DIR && \
   mv $SCALA_DIR /usr/share/scala && \
   chown -R root:root /usr/share/scala && \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/* /usr/local/bin && \
   case $SCALA_VERSION in \
-    "3"*) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
-    *) echo "println(util.Properties.versionMsg)" > test.scala ;; \
+    2*) echo "println(util.Properties.versionMsg)" > /test/test.scala ;; \
+    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > /test/test.scala ;; \
   esac && \
   scala -nocompdaemon test.scala && rm test.scala
 
