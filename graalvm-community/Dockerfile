@@ -48,8 +48,8 @@ RUN \
   chmod -R 755 /usr/share/scala && \
   ln -s /usr/share/scala/bin/* /usr/local/bin && \
   case $SCALA_VERSION in \
-    2*) echo "println(util.Properties.versionMsg)" > /test/test.scala ;; \
-    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > /test/test.scala ;; \
+    2*) echo "println(util.Properties.versionMsg)" > /test.scala ;; \
+    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
   esac && \
   scala -nocompdaemon test.scala && rm test.scala
 
