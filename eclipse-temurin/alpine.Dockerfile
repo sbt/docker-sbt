@@ -15,12 +15,10 @@ RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash c
 RUN \
     cd "/tmp" && \
     case $SCALA_VERSION in \
-      2.*) URL=https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=/usr/share/scala-$SCALA_VERSION EXTRACT_DIR=/usr/share ;; \
-      3.[0-5]*) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION EXTRACT_DIR=/usr/share ;; \
-      *) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala-$SCALA_VERSION EXTRACT_DIR=/usr/share/scala-$SCALA_VERSION ;; \
+      2.*) URL=https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=/usr/share/scala-$SCALA_VERSION ;; \
+      *) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION ;; \
     esac && \
-    mkdir -p $EXTRACT_DIR && \
-    curl -fsL --show-error $URL | tar xfz - -C $EXTRACT_DIR && \
+    curl -fsL --show-error $URL | tar xfz - -C /usr/share && \
     mv $SCALA_DIR $SCALA_HOME && \
     ln -s "$SCALA_HOME/bin/"* "/usr/bin/" && \
     update-ca-certificates && \
