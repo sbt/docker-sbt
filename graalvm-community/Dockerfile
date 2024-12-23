@@ -60,7 +60,7 @@ WORKDIR /home/sbtuser
 
 # Prepare sbt (warm cache)
 RUN \
-  sbt sbtVersion && \
+  sbt --script-version && \
   mkdir -p project && \
   echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
   echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
