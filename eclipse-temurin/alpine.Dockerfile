@@ -1,15 +1,27 @@
 # Use a multi-stage build to reduce the size of the final image
+# The builder will install curl, bc and ca-certificates which are needed to install sbt and scala.
+# The final image will only contain bash, git, rpm, sbt and scala.
+
 ARG BASE_IMAGE_TAG
 FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine} AS builder
 
 ARG SCALA_VERSION=3.4.0
-ARG SBT_VERSION=1.9.9
+ARG SBT_VERSION=1.10.7
 ARG USER_ID=1001
 ARG GROUP_ID=1001
 ENV SCALA_HOME=/usr/share/scala
 
 # Install dependencies
-RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash curl bc
+RUN apk add wget ca-certificates bash curl bc
+
+# Update certificates, still needed?
+RUN update-ca-certificates
+
+# Install sbt
+RUN \
+    curl -fsL --show-error https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar xfz - -C /usr/local && \
+    ln -s /usr/local/sbt/bin/* /usr/local/bin/ && \
+    sbt --script-version
 
 # Install scala
 RUN \
@@ -21,23 +33,12 @@ RUN \
     curl -fsL --show-error $URL | tar xfz - -C /usr/share && \
     mv $SCALA_DIR $SCALA_HOME && \
     ln -s "$SCALA_HOME/bin/"* "/usr/bin/" && \
-    update-ca-certificates && \
     scala -version && \
     case $SCALA_VERSION in \
       2*) echo "println(util.Properties.versionMsg)" > test.scala ;; \
       *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
     esac && \
     scala -nocompdaemon test.scala && rm test.scala
-
-# Install sbt
-RUN \
-    curl -fsL --show-error https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar xfz - -C /usr/local && \
-    $(mv /usr/local/sbt-launcher-packaging-$SBT_VERSION /usr/local/sbt || true) && \
-    ln -s /usr/local/sbt/bin/* /usr/local/bin/ && \
-    sbt -Dsbt.rootdir=true -batch sbtVersion && \
-    apk del .build-dependencies && \
-    rm -rf "/tmp/"* && \
-    rm -rf /var/cache/apk/*
 
 # Start a new stage for the final image
 FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine}
@@ -64,6 +65,7 @@ ENV PATH="/usr/share/scala/bin:${PATH}"
 
 # Prepare sbt (warm cache)
 RUN \
+  sbt --script-version && \
   mkdir -p project && \
   echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
   echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
