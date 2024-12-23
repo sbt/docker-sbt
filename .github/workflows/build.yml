@@ -123,15 +123,13 @@ jobs:
           SCALA_VERSION=${{ matrix.scalaVersion }}
         load: true
     - name: Test docker image as root (default)
-      if: ${{ !startsWith(matrix.scalaVersion, '2.12') && !contains(matrix.baseImageTag, 'alpine') }} 
+      if: ${{ !startsWith(matrix.scalaVersion, '2.12') }}
       # scala --version does not work on < 2.13
-      # sbt --script-version does not work on alpine https://github.com/sbt/sbt/issues/7942
       run: |
         docker run "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
     - name: Test docker image scala as sbtuser
-      if: ${{ !startsWith(matrix.scalaVersion, '2.12') && !contains(matrix.baseImageTag, 'alpine') }} 
+      if: ${{ !startsWith(matrix.scalaVersion, '2.12') }}
       # scala --version does not work on < 2.13
-      # sbt --script-version does not work on alpine https://github.com/sbt/sbt/issues/7942
       run: |
         docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
     - name: Log in to DockerHub
