@@ -126,12 +126,12 @@ jobs:
       if: ${{ !startsWith(matrix.scalaVersion, '2.12') }}
       # scala --version does not work on < 2.13
       run: |
-        docker run "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --allow-empty --script-version"
+        docker run "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
     - name: Test docker image scala as sbtuser
       if: ${{ !startsWith(matrix.scalaVersion, '2.12') }}
       # scala --version does not work on < 2.13
       run: |
-        docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --allow-empty --script-version"
+        docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
     - name: Log in to DockerHub
       if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
       uses: docker/login-action@v3
