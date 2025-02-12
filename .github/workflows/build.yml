@@ -23,10 +23,10 @@ jobs:
           'graalvm-community-21.0.2',
           'graalvm-ce-22.3.3-b1-java17',
           'eclipse-temurin-23.0.1_11',
-          'eclipse-temurin-21.0.5_11',
+          'eclipse-temurin-21.0.6_7',
           'eclipse-temurin-17.0.13_11',
           'eclipse-temurin-alpine-23.0.1_11',
-          'eclipse-temurin-alpine-21.0.5_11',
+          'eclipse-temurin-alpine-21.0.6_7',
           'eclipse-temurin-alpine-17.0.13_11',
           'amazoncorretto-al2023-21.0.5',
           'amazoncorretto-al2023-17.0.13'
@@ -51,9 +51,9 @@ jobs:
             dockerContext: 'eclipse-temurin'
             baseImageTag: '23.0.1_11-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-21.0.5_11'
+          - javaTag: 'eclipse-temurin-21.0.6_7'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '21.0.5_11-jdk'
+            baseImageTag: '21.0.6_7-jdk'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'eclipse-temurin-17.0.13_11'
             dockerContext: 'eclipse-temurin'
@@ -65,7 +65,7 @@ jobs:
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '23.0.1_11-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-21.0.5_11'
+          - javaTag: 'eclipse-temurin-alpine-21.0.6_7'
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '21.0.2_13-jdk-alpine'
