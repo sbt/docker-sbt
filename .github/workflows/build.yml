@@ -68,7 +68,7 @@ jobs:
           - javaTag: 'eclipse-temurin-alpine-21.0.6_7'
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '21.0.2_13-jdk-alpine'
+            baseImageTag: '21.0.6_7-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
           - javaTag: 'eclipse-temurin-alpine-17.0.13_11'
             dockerContext: 'eclipse-temurin'
