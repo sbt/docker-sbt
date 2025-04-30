@@ -23,11 +23,11 @@ jobs:
           'graalvm-community-21.0.2',
           'graalvm-ce-22.3.3-b1-java17',
           'eclipse-temurin-23.0.2_7',
-          'eclipse-temurin-21.0.6_7',
-          'eclipse-temurin-17.0.14_7',
+          'eclipse-temurin-21.0.7_6',
+          'eclipse-temurin-17.0.15_6',
           'eclipse-temurin-alpine-23.0.2_7',
-          'eclipse-temurin-alpine-21.0.6_7',
-          'eclipse-temurin-alpine-17.0.14_7',
+          'eclipse-temurin-alpine-21.0.7_6',
+          'eclipse-temurin-alpine-17.0.15_6',
           'amazoncorretto-al2023-21.0.6',
           'amazoncorretto-al2023-17.0.14'
         ]
@@ -51,13 +51,13 @@ jobs:
             dockerContext: 'eclipse-temurin'
             baseImageTag: '23.0.2_7-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-21.0.6_7'
+          - javaTag: 'eclipse-temurin-21.0.7_6'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '21.0.6_7-jdk'
+            baseImageTag: '21.0.7_6-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-17.0.14_7'
+          - javaTag: 'eclipse-temurin-17.0.15_6'
             dockerContext: 'eclipse-temurin'
-            baseImageTag: '17.0.14_7-jdk'
+            baseImageTag: '17.0.15_6-jdk'
             platforms: 'linux/amd64,linux/arm64'
           # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
           - javaTag: 'eclipse-temurin-alpine-23.0.2_7'
@@ -65,15 +65,15 @@ jobs:
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '23.0.2_7-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-21.0.6_7'
+          - javaTag: 'eclipse-temurin-alpine-21.0.7_6'
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '21.0.6_7-jdk-alpine'
+            baseImageTag: '21.0.7_6-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-17.0.14_7'
+          - javaTag: 'eclipse-temurin-alpine-17.0.15_6'
             dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '17.0.14_7-jdk-alpine'
+            baseImageTag: '17.0.15_6-jdk-alpine'
             platforms: 'linux/amd64'
           # https://hub.docker.com/_/amazoncorretto/tags
           - javaTag: 'amazoncorretto-al2023-21.0.6'
