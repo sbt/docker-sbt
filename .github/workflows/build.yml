@@ -19,7 +19,7 @@ jobs:
       matrix:
         scalaVersion: ['2.12.20', '2.13.16', '3.3.6', '3.7.1']
         javaTag: [
-          'graalvm-community-24.0.1',
+          'graalvm-community-24.0.2',
           'graalvm-community-21.0.2',
           'graalvm-ce-22.3.3-b1-java17',
           'eclipse-temurin-24.0.1_9',
@@ -28,14 +28,14 @@ jobs:
           'eclipse-temurin-alpine-24.0.1_9',
           'eclipse-temurin-alpine-21.0.7_6',
           'eclipse-temurin-alpine-17.0.15_6',
-          'amazoncorretto-al2023-21.0.7',
-          'amazoncorretto-al2023-17.0.15'
+          'amazoncorretto-al2023-21.0.8',
+          'amazoncorretto-al2023-17.0.16'
         ]
         include:
           # https://github.com/graalvm/container/pkgs/container/graalvm-community
-          - javaTag: 'graalvm-community-24.0.1'
+          - javaTag: 'graalvm-community-24.0.2'
             dockerContext: 'graalvm-community'
-            baseImageTag: '24.0.1-ol9'
+            baseImageTag: '24.0.2-ol9'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'graalvm-community-21.0.2'
             dockerContext: 'graalvm-community'
@@ -76,13 +76,13 @@ jobs:
             baseImageTag: '17.0.15_6-jdk-alpine'
             platforms: 'linux/amd64'
           # https://hub.docker.com/_/amazoncorretto/tags
-          - javaTag: 'amazoncorretto-al2023-21.0.7'
+          - javaTag: 'amazoncorretto-al2023-21.0.8'
             dockerContext: 'amazoncorretto'
-            baseImageTag: '21.0.7-al2023'
+            baseImageTag: '21.0.8-al2023'
             platforms: 'linux/amd64'
-          - javaTag: 'amazoncorretto-al2023-17.0.15'
+          - javaTag: 'amazoncorretto-al2023-17.0.16'
             dockerContext: 'amazoncorretto'
-            baseImageTag: '17.0.15-al2023'
+            baseImageTag: '17.0.16-al2023'
             platforms: 'linux/amd64'
     steps:
     - uses: actions/checkout@v4
