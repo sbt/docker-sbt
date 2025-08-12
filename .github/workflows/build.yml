@@ -85,7 +85,7 @@ jobs:
             baseImageTag: '17.0.16-al2023'
             platforms: 'linux/amd64'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.6.0
     - name: Set up Docker Buildx
