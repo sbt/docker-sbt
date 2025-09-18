@@ -22,7 +22,7 @@ jobs:
           'graalvm-community-25.0.0',
           'graalvm-community-21.0.2',
           'graalvm-ce-22.3.3-b1-java17',
-          'eclipse-temurin-25.0.1_9',
+          'eclipse-temurin-24.0.1_9',
           'eclipse-temurin-21.0.8_9',
           'eclipse-temurin-17.0.15_6',
           'eclipse-temurin-alpine-24.0.1_9',
