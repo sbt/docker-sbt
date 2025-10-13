@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scalaVersion: ['2.12.20', '2.13.17', '3.3.6', '3.7.3']
+        scalaVersion: ['2.12.20', '2.13.17', '3.3.7', '3.7.3']
         javaTag: [
           'graalvm-community-25.0.0',
           'graalvm-community-21.0.2',
