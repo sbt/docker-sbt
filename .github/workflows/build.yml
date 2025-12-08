@@ -19,7 +19,7 @@ jobs:
       matrix:
         scalaVersion: ['2.12.21', '2.13.18', '3.3.7', '3.7.4']
         javaTag: [
-          'graalvm-community-25.0.0',
+          'graalvm-community-25.0.1',
           'graalvm-community-21.0.2',
           'graalvm-ce-22.3.3-b1-java17',
           'eclipse-temurin-25.0.1_8',
@@ -36,9 +36,9 @@ jobs:
         ]
         include:
           # https://github.com/graalvm/container/pkgs/container/graalvm-community
-          - javaTag: 'graalvm-community-25.0.0'
+          - javaTag: 'graalvm-community-25.0.1'
             dockerContext: 'graalvm-community'
-            baseImageTag: '25.0.0-ol10'
+            baseImageTag: '25.0.1-ol10'
             platforms: 'linux/amd64,linux/arm64'
           - javaTag: 'graalvm-community-21.0.2'
             dockerContext: 'graalvm-community'
