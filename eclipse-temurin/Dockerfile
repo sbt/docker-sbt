@@ -47,9 +47,9 @@ RUN \
   mkdir -p /test && \
   case $SCALA_VERSION in \
     2*) echo "println(util.Properties.versionMsg)" > /test/test.scala ;; \
-    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > /test/test.scala ;; \
+    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[?, ?]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > /test/test.scala ;; \
   esac && \
-  scala -nocompdaemon test/test.scala && \
+  scala -nocompdaemon --server=false test/test.scala && \
   rm -fr test
 
 # Symlink java to have it available on sbtuser's PATH

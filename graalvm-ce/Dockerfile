@@ -47,9 +47,9 @@ RUN \
   ln -s /usr/share/scala/bin/* /usr/local/bin && \
   case $SCALA_VERSION in \
     2*) echo "println(util.Properties.versionMsg)" > test.scala ;; \
-    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[_, _]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
+    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[?, ?]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala ;; \
   esac && \
-  scala -nocompdaemon test.scala && rm test.scala
+  scala -nocompdaemon --server=false test.scala && rm test.scala
 
 # Add and use user sbtuser
 RUN groupadd --gid $GROUP_ID sbtuser && useradd --gid $GROUP_ID --uid $USER_ID sbtuser --shell /bin/bash
