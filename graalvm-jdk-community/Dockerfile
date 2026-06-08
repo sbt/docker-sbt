@@ -3,16 +3,20 @@
 #
 # https://github.com/sbt/docker-sbt
 #
+# Based on the size-compact GraalVM Community JDK image (ghcr.io/graalvm/jdk-community).
+# This is the GraalVM JDK only: it does NOT include native-image or the polyglot
+# tooling. If you need native-image, use the graalvm-community image instead.
+#
 
 # Pull base image
 ARG BASE_IMAGE_TAG
-FROM ghcr.io/graalvm/graalvm-ce:${BASE_IMAGE_TAG:-java11-21.3.0}
+FROM ghcr.io/graalvm/jdk-community:${BASE_IMAGE_TAG:-21.0.2-ol9}
 
 # Env variables
 ARG SCALA_VERSION
-ENV SCALA_VERSION=${SCALA_VERSION:-2.13.10}
+ENV SCALA_VERSION=${SCALA_VERSION:-3.3.7}
 ARG SBT_VERSION
-ENV SBT_VERSION=${SBT_VERSION:-1.6.2}
+ENV SBT_VERSION=${SBT_VERSION:-1.12.11}
 ENV JAVA_OPTS=-XX:+UseG1GC
 ARG USER_ID
 ENV USER_ID=${USER_ID:-1001}
@@ -20,10 +24,11 @@ ARG GROUP_ID
 ENV GROUP_ID=${GROUP_ID:-1001}
 
 # Install dependencies
-# ps for scala3 https://github.com/VirtusLab/scala-cli/issues/3130
+# curl, tar and gzip for downloading and unpacking sbt and scala (the compact
+# image may not ship them); ps for scala3 https://github.com/VirtusLab/scala-cli/issues/3130
 # git and rpm for sbt-native-packager (see https://github.com/sbt/docker-sbt/pull/114)
 RUN \
-  microdnf -y install procps git rpm && \
+  microdnf -y install curl tar gzip procps git rpm && \
   rm -rf /var/cache/dnf/* && \
   microdnf clean all
 

@@ -9,7 +9,7 @@ Images are updated daily
 Available JDK base images:
 * eclipse-temurin
 * graalvm-community
-* graalvm-ce
+* graalvm-jdk-community (compact GraalVM JDK; smaller, but no `native-image` - use graalvm-community if you need it)
 * amazoncorretto
 
 ## Where to get images
