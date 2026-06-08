@@ -8,6 +8,7 @@ Images are updated daily
 
 Available JDK base images:
 * eclipse-temurin
+* graalvm-community
 * graalvm-ce
 * amazoncorretto
 
@@ -57,6 +58,32 @@ The container is prepared to be used with a non-root user called `sbtuser`
 ```
 docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-17.0.4_1.7.1_3.2.0
 ```
+
+## Automated updates with Renovate ##
+
+Because the tags combine three independent versions (`<JDK>_<sbt>_<Scala>`),
+[Renovate](https://docs.renovatebot.com) needs a custom `versioning` to parse
+them. The example below pins the image variant (e.g. `eclipse-temurin`) and the
+sbt/Scala versions you already use, and proposes updates whenever the JDK part
+(`<major>.<minor>.<patch>_<build>`) is bumped:
+
+```json
+{
+  "packageRules": [
+    {
+      "description": "Parse sbtscala/scala-sbt tags: <JDK>_<sbt>_<Scala>",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["sbtscala/scala-sbt"],
+      "versioning": "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)_(?<build>\\d+)_\\d+\\.\\d+\\.\\d+_\\d+\\.\\d+\\.\\d+$"
+    }
+  ]
+}
+```
+
+The `compatibility` group keeps Renovate within the same image variant, and the
+trailing `_\d+\.\d+\.\d+_\d+\.\d+\.\d+` matches (but ignores) the sbt and Scala
+parts. Note that JDK bumps in this repo can lag slightly behind upstream JDK
+releases.
 
 ## Contribution policy ##
 
