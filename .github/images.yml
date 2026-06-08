@@ -53,28 +53,22 @@ javaImage:
     platforms: 'linux/amd64'
 
   # ===== graalvm-community (GraalVM users skew modern: no Scala 2.12) =====
+  # GraalVM CE only maintains the latest line (no LTS backports), so a pinned
+  # major goes stale and unfixable. We ship a single entry that tracks the
+  # latest release; Renovate may bump it across majors (see renovate.json).
   # https://github.com/graalvm/container/pkgs/container/graalvm-community
   # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
   - dockerContext: 'graalvm-community'
     baseImageTag: '25.0.1-ol10'
     platforms: 'linux/amd64,linux/arm64'
     dropScala: ['2.12']
-  # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
-  - dockerContext: 'graalvm-community'
-    baseImageTag: '21.0.2-ol9'
-    platforms: 'linux/amd64,linux/arm64'
-    dropScala: ['2.12']
 
   # ===== graalvm-jdk-community (compact GraalVM JDK, no native-image; no Scala 2.12) =====
+  # Latest-only, same rationale as graalvm-community above.
   # https://github.com/graalvm/container/pkgs/container/jdk-community
   # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
   - dockerContext: 'graalvm-jdk-community'
     baseImageTag: '25.0.1-ol10'
-    platforms: 'linux/amd64,linux/arm64'
-    dropScala: ['2.12']
-  # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
-  - dockerContext: 'graalvm-jdk-community'
-    baseImageTag: '21.0.2-ol9'
     platforms: 'linux/amd64,linux/arm64'
     dropScala: ['2.12']
 
