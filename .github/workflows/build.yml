@@ -6,6 +6,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# prepare -> build (one job per arch on a native runner: test + push by digest)
+#         -> merge  (assemble the multi-arch tag from the per-arch digests)
+#
+# All images are described as data in .github/images.yml. Each architecture is
+# built exactly once on its own native runner (no QEMU), tested there, and only
+# then assembled into the published multi-arch tag. A failing arch fails in
+# isolation (fail-fast: false): every tag whose architectures all built is still
+# pushed. An incomplete tag fails its merge job (red) instead of publishing
+# half-built, so a transient failure can be recovered with "Re-run failed jobs".
+
 on:
   push:
     branches:
@@ -14,264 +24,185 @@ on:
     branches:
       - master
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: '0 0 * * *'
 
+env:
+  IMAGE: sbtscala/scala-sbt
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
-    env:
-      # sbt is baked into every image; kept on the 1.x line by Renovate (see
-      # .github/renovate.json). A 2.0-RC matrix dimension is tracked separately.
-      # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
-      SBT_VERSION: '1.12.11'
-    strategy:
-      fail-fast: false
-      matrix:
-        # Renovate keeps each Scala version on its own minor branch (patch updates
-        # only); see .github/renovate.json. The published tag uses these verbatim.
-        scalaVersion:
-          # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-          - '2.12.21'
-          # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-          - '2.13.18'
-          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-          - '3.3.7'
-          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-          - '3.8.4'
-        # baseImageTag is the single source of truth for each base image version
-        # (Renovate updates it, pinned to the major in the comment). The public
-        # image label (the "<java>" part of the tag) is derived from it in the
-        # "Compute java tag" step below, so versions are maintained in one place.
-        javaImage:
-          # https://github.com/graalvm/container/pkgs/container/graalvm-community
-          # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
-          - dockerContext: 'graalvm-community'
-            baseImageTag: '25.0.1-ol10'
-            platforms: 'linux/amd64,linux/arm64'
-          # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
-          - dockerContext: 'graalvm-community'
-            baseImageTag: '21.0.2-ol9'
-            platforms: 'linux/amd64,linux/arm64'
-          # Size-compact GraalVM JDK (no native-image). https://github.com/graalvm/container/pkgs/container/jdk-community
-          # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
-          - dockerContext: 'graalvm-jdk-community'
-            baseImageTag: '25.0.1-ol10'
-            platforms: 'linux/amd64,linux/arm64'
-          # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
-          - dockerContext: 'graalvm-jdk-community'
-            baseImageTag: '21.0.2-ol9'
-            platforms: 'linux/amd64,linux/arm64'
-          # NOTE: eclipse-temurin is built by .github/workflows/build-temurin.yml
-          # (native-runner pipeline, see issue #166 / .github/images.yml).
-          # https://hub.docker.com/_/amazoncorretto/tags
-          # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
-          - dockerContext: 'amazoncorretto'
-            baseImageTag: '25.0.0-al2023'
-            platforms: 'linux/amd64'
-          # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
-          - dockerContext: 'amazoncorretto'
-            baseImageTag: '21.0.8-al2023'
-            platforms: 'linux/amd64'
-          # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
-          - dockerContext: 'amazoncorretto'
-            baseImageTag: '17.0.16-al2023'
-            platforms: 'linux/amd64'
-        # GraalVM users skew modern; don't build Scala 2.12 for the graal images.
-        # (amazoncorretto keeps 2.12.) The javaImage objects must match the entries
-        # above exactly for the exclusion to apply.
-        exclude:
-          - scalaVersion: '2.12.21'
-            javaImage:
-              dockerContext: 'graalvm-community'
-              baseImageTag: '25.0.1-ol10'
-              platforms: 'linux/amd64,linux/arm64'
-          - scalaVersion: '2.12.21'
-            javaImage:
-              dockerContext: 'graalvm-community'
-              baseImageTag: '21.0.2-ol9'
-              platforms: 'linux/amd64,linux/arm64'
-          - scalaVersion: '2.12.21'
-            javaImage:
-              dockerContext: 'graalvm-jdk-community'
-              baseImageTag: '25.0.1-ol10'
-              platforms: 'linux/amd64,linux/arm64'
-          - scalaVersion: '2.12.21'
-            javaImage:
-              dockerContext: 'graalvm-jdk-community'
-              baseImageTag: '21.0.2-ol9'
-              platforms: 'linux/amd64,linux/arm64'
+    outputs:
+      build: ${{ steps.gen.outputs.build }}
+      merge: ${{ steps.gen.outputs.merge }}
     steps:
     - uses: actions/checkout@v6
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v4.1.0
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v4.1.0
-      #      with:
-      #        install: true
-    - name: Available platforms
-      run: echo ${{ steps.buildx.outputs.platforms }}
-    - name: Compute java tag
-      id: java_tag
-      # Derive the public "<java>" part of the image tag from baseImageTag so the
-      # version is only maintained in one place (the matrix above).
-      env:
-        DOCKER_CONTEXT: ${{ matrix.javaImage.dockerContext }}
-        BASE_IMAGE_TAG: ${{ matrix.javaImage.baseImageTag }}
+    - name: Generate build and merge matrices
+      id: gen
       run: |
-        case "$DOCKER_CONTEXT" in
-          eclipse-temurin)
-            if [[ "$BASE_IMAGE_TAG" == *-jdk-alpine ]]; then
-              JAVA_TAG="eclipse-temurin-alpine-${BASE_IMAGE_TAG%-jdk-alpine}"
-            else
-              JAVA_TAG="eclipse-temurin-${BASE_IMAGE_TAG%-jdk}"
-            fi
-            ;;
-          graalvm-community)
-            JAVA_TAG="graalvm-community-${BASE_IMAGE_TAG%-ol*}"
-            ;;
-          graalvm-jdk-community)
-            JAVA_TAG="graalvm-jdk-community-${BASE_IMAGE_TAG%-ol*}"
-            ;;
-          amazoncorretto)
-            JAVA_TAG="amazoncorretto-al2023-${BASE_IMAGE_TAG%-al2023}"
-            ;;
-          *)
-            echo "Unknown dockerContext: $DOCKER_CONTEXT" >&2 ; exit 1 ;;
-        esac
-        echo "JAVA_TAG=$JAVA_TAG" >> $GITHUB_OUTPUT
-    - name: Create docker tag
-      id: create_docker_tag
+        data=$(yq -o=json '.' .github/images.yml)
+        # jq helpers: derive the public "<java>" tag label per distro, and the
+        # Scala versions to build for an image (global list minus its dropScala
+        # "major.minor" prefixes). Duplicated in both programs as jq has no shared
+        # library here.
+        defs='
+          def imageLabel($img):
+            $img.dockerContext as $c | $img.baseImageTag as $t
+            | if $c == "eclipse-temurin" then
+                (if ($t | endswith("-jdk-alpine")) then "eclipse-temurin-alpine-" + ($t | sub("-jdk-alpine$";""))
+                 else "eclipse-temurin-" + ($t | sub("-jdk$";"")) end)
+              elif $c == "graalvm-community" then "graalvm-community-" + ($t | sub("-ol[0-9]+$";""))
+              elif $c == "graalvm-jdk-community" then "graalvm-jdk-community-" + ($t | sub("-ol[0-9]+$";""))
+              elif $c == "amazoncorretto" then "amazoncorretto-al2023-" + ($t | sub("-al2023$";""))
+              else error("unknown dockerContext: \($c)") end;
+          def scalasFor($root; $img):
+            [ $root.scalaVersion[] | . as $s
+              | select([ ($img.dropScala // [])[] as $p | $s | startswith($p) ] | any | not) ];
+        '
+        # build matrix: one job per scala x image x platform (native runner per arch)
+        build=$(echo "$data" | jq -c "$defs"'
+          . as $root
+          | [ $root.javaImage[] as $img
+              | (scalasFor($root; $img))[] as $scala
+              | ($img.platforms | split(",")[]) as $platform
+              | {
+                  scala: $scala,
+                  context: $img.dockerContext,
+                  dockerfile: ($img.dockerfile // "Dockerfile"),
+                  baseImageTag: $img.baseImageTag,
+                  label: imageLabel($img),
+                  platform: $platform,
+                  platformId: ($platform | sub("^linux/";"") | gsub("/";"-")),
+                  runner: (if ($platform | startswith("linux/arm64")) then "ubuntu-24.04-arm" else "ubuntu-24.04" end),
+                  sbt: ($img.sbt // $root.SBT_VERSION)
+                } ]')
+        # merge matrix: one job per final tag (scala x image)
+        merge=$(echo "$data" | jq -c "$defs"'
+          . as $root
+          | [ $root.javaImage[] as $img
+              | (scalasFor($root; $img))[] as $scala
+              | {
+                  scala: $scala,
+                  label: imageLabel($img),
+                  platformCount: ($img.platforms | split(",") | length),
+                  sbt: ($img.sbt // $root.SBT_VERSION)
+                } ]')
+        echo "build={\"include\":$build}" >> "$GITHUB_OUTPUT"
+        echo "merge={\"include\":$merge}" >> "$GITHUB_OUTPUT"
+    - name: Show matrices
       run: |
-        TAG=sbtscala/scala-sbt:${{ steps.java_tag.outputs.JAVA_TAG }}_${{ env.SBT_VERSION }}_${{ matrix.scalaVersion }}
-        echo "TAG=$TAG" >> $GITHUB_OUTPUT
-    - name: Build docker image
-      uses: docker/build-push-action@v7
-      with:
-        context: ${{ matrix.javaImage.dockerContext }}
-        no-cache: true
-        tags: ${{ steps.create_docker_tag.outputs.TAG }}
-        file: ${{ matrix.javaImage.dockerContext }}/Dockerfile
-        build-args: |
-          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
-          SBT_VERSION=${{ env.SBT_VERSION }}
-          SCALA_VERSION=${{ matrix.scalaVersion }}
-        load: true
-    - name: Test docker image as root (default)
-      if: ${{ !startsWith(matrix.scalaVersion, '2.12') }}
-      # scala --version does not work on < 2.13
-      run: |
-        docker run "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
-    - name: Test docker image scala as sbtuser
-      if: ${{ !startsWith(matrix.scalaVersion, '2.12') }}
-      # scala --version does not work on < 2.13
-      run: |
-        docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
-    - name: Test docker image launches as an arbitrary uid (issue #258)
-      # full sbt launch (not --script-version) so it exercises temp/HOME writes
-      run: |
-        docker run --rm -u 1234 -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" sbt --allow-empty exit
-    - name: Log in to DockerHub
-      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
-      uses: docker/login-action@v4
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Rebuild and push ${{ matrix.javaImage.platforms }} docker images
-      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
-      uses: docker/build-push-action@v7
-      with:
-        context: ${{ matrix.javaImage.dockerContext }}
-        file: ${{ matrix.javaImage.dockerContext }}/Dockerfile
-        tags: ${{ steps.create_docker_tag.outputs.TAG }}
-        build-args: |
-          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
-          SBT_VERSION=${{ env.SBT_VERSION }}
-          SCALA_VERSION=${{ matrix.scalaVersion }}
-        platforms: ${{ matrix.javaImage.platforms }}
-        push: true
+        echo '${{ steps.gen.outputs.build }}' | jq '.include | length as $n | "build jobs: \($n)"'
+        echo '${{ steps.gen.outputs.merge }}' | jq '.include | length as $n | "merge jobs (tags): \($n)"'
 
-  # Preview builds for the sbt 2.0 release candidate. Deliberately limited to the
-  # most-used base image (eclipse-temurin LTS + latest) and Scala 3 (LTS + latest)
-  # to keep this from multiplying into the full build matrix above.
-  build-sbt2:
-    runs-on: ubuntu-latest
-    env:
-      # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-RC(?<build>\d+)$
-      SBT_VERSION: '2.0.0-RC15'
+  build:
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
-      matrix:
-        scalaVersion:
-          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-          - '3.3.7'
-          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-          - '3.8.4'
-        javaImage:
-          # https://hub.docker.com/_/eclipse-temurin/tags
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-          - dockerContext: 'eclipse-temurin'
-            baseImageTag: '25.0.1_8-jdk'
-            platforms: 'linux/amd64,linux/arm64'
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-          - dockerContext: 'eclipse-temurin'
-            baseImageTag: '21.0.8_9-jdk'
-            platforms: 'linux/amd64,linux/arm64'
+      matrix: ${{ fromJSON(needs.prepare.outputs.build) }}
     steps:
     - uses: actions/checkout@v6
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v4.1.0
     - name: Set up Docker Buildx
-      id: buildx
       uses: docker/setup-buildx-action@v4.1.0
-    - name: Available platforms
-      run: echo ${{ steps.buildx.outputs.platforms }}
-    - name: Compute java tag
-      id: java_tag
-      env:
-        BASE_IMAGE_TAG: ${{ matrix.javaImage.baseImageTag }}
-      run: |
-        echo "JAVA_TAG=eclipse-temurin-${BASE_IMAGE_TAG%-jdk}" >> $GITHUB_OUTPUT
-    - name: Create docker tag
-      id: create_docker_tag
-      run: |
-        TAG=sbtscala/scala-sbt:${{ steps.java_tag.outputs.JAVA_TAG }}_${{ env.SBT_VERSION }}_${{ matrix.scalaVersion }}
-        echo "TAG=$TAG" >> $GITHUB_OUTPUT
-    - name: Build docker image
+    - name: Build and load for testing (${{ matrix.platform }})
       uses: docker/build-push-action@v7
       with:
-        context: ${{ matrix.javaImage.dockerContext }}
+        context: ${{ matrix.context }}
+        file: ${{ matrix.context }}/${{ matrix.dockerfile }}
+        platforms: ${{ matrix.platform }}
         no-cache: true
-        tags: ${{ steps.create_docker_tag.outputs.TAG }}
-        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
-        build-args: |
-          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
-          SBT_VERSION=${{ env.SBT_VERSION }}
-          SCALA_VERSION=${{ matrix.scalaVersion }}
         load: true
-    - name: Test docker image as root (default)
-      run: |
-        docker run "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
-    - name: Test docker image scala as sbtuser
-      run: |
-        docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
+        tags: scala-sbt:test
+        build-args: |
+          BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
+          SBT_VERSION=${{ matrix.sbt }}
+          SCALA_VERSION=${{ matrix.scala }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.label }}-${{ matrix.sbt }}-${{ matrix.scala }}-${{ matrix.platformId }}
+    - name: Test image as root (default)
+      if: ${{ !startsWith(matrix.scala, '2.12') }}
+      # scala --version does not work on < 2.13
+      run: docker run --rm scala-sbt:test /bin/bash -c "scala --version && sbt --script-version"
+    - name: Test image scala as sbtuser
+      if: ${{ !startsWith(matrix.scala, '2.12') }}
+      run: docker run --rm -u sbtuser -w /home/sbtuser scala-sbt:test /bin/bash -c "scala --version && sbt --script-version"
+    - name: Test image launches as an arbitrary uid (issue #258)
+      # write a build file (also checks the home dir is writable) then fully
+      # launch sbt, which exercises the temp/HOME writes that previously failed
+      run: docker run --rm -u 1234 -w /home/sbtuser scala-sbt:test /bin/bash -c "touch build.sbt && sbt exit"
     - name: Log in to DockerHub
-      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+      if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
       uses: docker/login-action@v4
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Rebuild and push ${{ matrix.javaImage.platforms }} docker images
-      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+    - name: Build and push by digest (${{ matrix.platform }})
+      id: push
+      if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
       uses: docker/build-push-action@v7
       with:
-        context: ${{ matrix.javaImage.dockerContext }}
-        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
-        tags: ${{ steps.create_docker_tag.outputs.TAG }}
+        context: ${{ matrix.context }}
+        file: ${{ matrix.context }}/${{ matrix.dockerfile }}
+        platforms: ${{ matrix.platform }}
+        # Reuses the layers just built for the test above (same run, same scope),
+        # so this does not rebuild from scratch.
+        cache-from: type=gha,scope=${{ matrix.label }}-${{ matrix.sbt }}-${{ matrix.scala }}-${{ matrix.platformId }}
         build-args: |
-          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
-          SBT_VERSION=${{ env.SBT_VERSION }}
-          SCALA_VERSION=${{ matrix.scalaVersion }}
-        platforms: ${{ matrix.javaImage.platforms }}
-        push: true
+          BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
+          SBT_VERSION=${{ matrix.sbt }}
+          SCALA_VERSION=${{ matrix.scala }}
+        outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+    - name: Export digest
+      if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
+      run: |
+        mkdir -p /tmp/digests
+        digest="${{ steps.push.outputs.digest }}"
+        touch "/tmp/digests/${digest#sha256:}"
+    - name: Upload digest
+      if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: digest-${{ matrix.label }}_${{ matrix.sbt }}_${{ matrix.scala }}-${{ matrix.platformId }}
+        path: /tmp/digests/*
+        if-no-files-found: error
+        retention-days: 1
+
+  merge:
+    needs: [prepare, build]
+    # Run even when some build jobs failed, so every tag whose architectures all
+    # built still gets pushed. Only require prepare (for the matrix) to succeed.
+    if: ${{ !cancelled() && needs.prepare.result == 'success' && github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.merge) }}
+    steps:
+    - name: Download digests for ${{ matrix.label }} / scala ${{ matrix.scala }}
+      uses: actions/download-artifact@v4
+      with:
+        path: /tmp/digests
+        pattern: digest-${{ matrix.label }}_${{ matrix.sbt }}_${{ matrix.scala }}-*
+        merge-multiple: true
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4.1.0
+    - name: Log in to DockerHub
+      uses: docker/login-action@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Create and push multi-arch manifest
+      working-directory: /tmp/digests
+      run: |
+        shopt -s nullglob
+        tag="${IMAGE}:${{ matrix.label }}_${{ matrix.sbt }}_${{ matrix.scala }}"
+        digests=( * )
+        expected=${{ matrix.platformCount }}
+        # Fail (rather than silently skip) when not all architectures are present,
+        # so a transient build failure can be recovered with "Re-run failed jobs":
+        # the failed build re-uploads its digest and this job re-runs to push it.
+        # fail-fast: false keeps this from affecting the other tags.
+        if [ "${#digests[@]}" -ne "$expected" ]; then
+          echo "::error title=Incomplete::${#digests[@]}/${expected} architectures available for ${tag}; not publishing. Re-run the failed build job(s) then this job to recover."
+          exit 1
+        fi
+        docker buildx imagetools create -t "$tag" "${digests[@]/#/${IMAGE}@sha256:}"
+        docker buildx imagetools inspect "$tag"

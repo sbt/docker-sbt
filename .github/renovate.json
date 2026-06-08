@@ -9,7 +9,7 @@
     "enabled": false
   },
   "dockerfile": {
-    "description": "Base images are pinned via the build matrix in build.yml, not the Dockerfiles",
+    "description": "Base images are pinned via .github/images.yml, not the Dockerfiles",
     "enabled": false
   },
   "docker-compose": {
@@ -20,7 +20,6 @@
       "customType": "regex",
       "description": "JDK base images in the build matrix (one entry per `# renovate:` comment)",
       "managerFilePatterns": [
-        "/^\\.github/workflows/build\\.yml$/",
         "/^\\.github/images\\.yml$/"
       ],
       "matchStrings": [
@@ -31,7 +30,6 @@
       "customType": "regex",
       "description": "Scala versions in the build matrix (one entry per `# renovate:` comment)",
       "managerFilePatterns": [
-        "/^\\.github/workflows/build\\.yml$/",
         "/^\\.github/images\\.yml$/"
       ],
       "matchStrings": [
@@ -40,13 +38,12 @@
     },
     {
       "customType": "regex",
-      "description": "sbt version baked into every image (SBT_VERSION env var)",
+      "description": "sbt version: the global SBT_VERSION and per-image `sbt:` overrides",
       "managerFilePatterns": [
-        "/^\\.github/workflows/build\\.yml$/",
         "/^\\.github/images\\.yml$/"
       ],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s+SBT_VERSION: '(?<currentValue>[^']+)'"
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s+(?:SBT_VERSION|sbt): '(?<currentValue>[^']+)'"
       ]
     }
   ],

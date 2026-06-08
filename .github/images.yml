@@ -1,10 +1,11 @@
-# Build matrix data for the eclipse-temurin images, consumed by the native-runner
-# pipeline in .github/workflows/build-temurin.yml.
+# Build matrix data for all images, consumed by the native-runner pipeline in
+# .github/workflows/build.yml. Renovate updates the versions; see renovate.json.
 #
-# Line shapes intentionally match the matrix in build.yml so the same Renovate
-# managers track them (see .github/renovate.json). During the Option 2 rollout
-# SBT_VERSION and scalaVersion are still also defined in build.yml for the
-# not-yet-migrated variants; Renovate keeps the copies in sync.
+# Each javaImage entry supports optional fields:
+#   dockerfile  - Dockerfile name within the context (default: Dockerfile)
+#   platforms   - comma-separated build platforms (drives the per-arch fan-out)
+#   dropScala   - list of "major.minor" prefixes to NOT build for this image
+#   sbt         - sbt version override (default: the top-level SBT_VERSION)
 
 # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
 SBT_VERSION: '1.12.11'
@@ -19,9 +20,8 @@ scalaVersion:
   # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
   - '3.8.4'
 
-# eclipse-temurin base images. `platforms` (comma separated) drives the per-arch
-# native build fan-out; the public "<java>" tag label is derived from baseImageTag.
 javaImage:
+  # ===== eclipse-temurin =====
   # https://hub.docker.com/_/eclipse-temurin/tags
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
@@ -51,3 +51,64 @@ javaImage:
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '17.0.15_6-jdk-alpine'
     platforms: 'linux/amd64'
+
+  # ===== graalvm-community (GraalVM users skew modern: no Scala 2.12) =====
+  # https://github.com/graalvm/container/pkgs/container/graalvm-community
+  # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+  - dockerContext: 'graalvm-community'
+    baseImageTag: '25.0.1-ol10'
+    platforms: 'linux/amd64,linux/arm64'
+    dropScala: ['2.12']
+  # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+  - dockerContext: 'graalvm-community'
+    baseImageTag: '21.0.2-ol9'
+    platforms: 'linux/amd64,linux/arm64'
+    dropScala: ['2.12']
+
+  # ===== graalvm-jdk-community (compact GraalVM JDK, no native-image; no Scala 2.12) =====
+  # https://github.com/graalvm/container/pkgs/container/jdk-community
+  # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+  - dockerContext: 'graalvm-jdk-community'
+    baseImageTag: '25.0.1-ol10'
+    platforms: 'linux/amd64,linux/arm64'
+    dropScala: ['2.12']
+  # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+  - dockerContext: 'graalvm-jdk-community'
+    baseImageTag: '21.0.2-ol9'
+    platforms: 'linux/amd64,linux/arm64'
+    dropScala: ['2.12']
+
+  # ===== amazoncorretto (amd64 only) =====
+  # https://hub.docker.com/_/amazoncorretto/tags
+  # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
+  - dockerContext: 'amazoncorretto'
+    baseImageTag: '25.0.0-al2023'
+    platforms: 'linux/amd64'
+  # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
+  - dockerContext: 'amazoncorretto'
+    baseImageTag: '21.0.8-al2023'
+    platforms: 'linux/amd64'
+  # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
+  - dockerContext: 'amazoncorretto'
+    baseImageTag: '17.0.16-al2023'
+    platforms: 'linux/amd64'
+
+  # ===== sbt 2.0 release-candidate preview (eclipse-temurin LTS + latest, Scala 3 only) =====
+  # amd64 only: sbt 2.0 leaves a background server writing into target/ after the
+  # client returns, which races the warm-cache cleanup (`rm -r target`) on fast
+  # native arm64. Revisit (and restore arm64) once the warm cache shuts the
+  # sbt server down before cleanup.
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  - dockerContext: 'eclipse-temurin'
+    baseImageTag: '25.0.1_8-jdk'
+    platforms: 'linux/amd64'
+    dropScala: ['2.12', '2.13']
+    # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-RC(?<build>\d+)$
+    sbt: '2.0.0-RC15'
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  - dockerContext: 'eclipse-temurin'
+    baseImageTag: '21.0.8_9-jdk'
+    platforms: 'linux/amd64'
+    dropScala: ['2.12', '2.13']
+    # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-RC(?<build>\d+)$
+    sbt: '2.0.0-RC15'
