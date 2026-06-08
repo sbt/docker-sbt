@@ -29,10 +29,6 @@ javaImage:
     platforms: 'linux/amd64,linux/arm64'
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
-    baseImageTag: '24.0.1_9-jdk'
-    platforms: 'linux/amd64,linux/arm64'
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-  - dockerContext: 'eclipse-temurin'
     baseImageTag: '21.0.8_9-jdk'
     platforms: 'linux/amd64,linux/arm64'
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
@@ -44,11 +40,6 @@ javaImage:
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '25.0.1_8-jdk-alpine'
-    platforms: 'linux/amd64,linux/arm64/v8'
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
-  - dockerContext: 'eclipse-temurin'
-    dockerfile: 'alpine.Dockerfile'
-    baseImageTag: '24.0.1_9-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
