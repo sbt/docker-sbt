@@ -189,3 +189,87 @@ jobs:
           SCALA_VERSION=${{ matrix.scalaVersion }}
         platforms: ${{ matrix.javaImage.platforms }}
         push: true
+
+  # Preview builds for the sbt 2.0 release candidate. Deliberately limited to the
+  # most-used base image (eclipse-temurin LTS + latest) and Scala 3 (LTS + latest)
+  # to keep this from multiplying into the full build matrix above.
+  build-sbt2:
+    runs-on: ubuntu-latest
+    env:
+      # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-RC(?<build>\d+)$
+      SBT_VERSION: '2.0.0-RC15'
+    strategy:
+      fail-fast: false
+      matrix:
+        scalaVersion:
+          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+          - '3.3.7'
+          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+          - '3.8.4'
+        javaImage:
+          # https://hub.docker.com/_/eclipse-temurin/tags
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+          - dockerContext: 'eclipse-temurin'
+            baseImageTag: '25.0.1_8-jdk'
+            platforms: 'linux/amd64,linux/arm64'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+          - dockerContext: 'eclipse-temurin'
+            baseImageTag: '21.0.8_9-jdk'
+            platforms: 'linux/amd64,linux/arm64'
+    steps:
+    - uses: actions/checkout@v6
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v4.1.0
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v4.1.0
+    - name: Available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
+    - name: Compute java tag
+      id: java_tag
+      env:
+        BASE_IMAGE_TAG: ${{ matrix.javaImage.baseImageTag }}
+      run: |
+        echo "JAVA_TAG=eclipse-temurin-${BASE_IMAGE_TAG%-jdk}" >> $GITHUB_OUTPUT
+    - name: Create docker tag
+      id: create_docker_tag
+      run: |
+        TAG=sbtscala/scala-sbt:${{ steps.java_tag.outputs.JAVA_TAG }}_${{ env.SBT_VERSION }}_${{ matrix.scalaVersion }}
+        echo "TAG=$TAG" >> $GITHUB_OUTPUT
+    - name: Build docker image
+      uses: docker/build-push-action@v7
+      with:
+        context: ${{ matrix.javaImage.dockerContext }}
+        no-cache: true
+        tags: ${{ steps.create_docker_tag.outputs.TAG }}
+        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
+        build-args: |
+          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
+          SBT_VERSION=${{ env.SBT_VERSION }}
+          SCALA_VERSION=${{ matrix.scalaVersion }}
+        load: true
+    - name: Test docker image as root (default)
+      run: |
+        docker run "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
+    - name: Test docker image scala as sbtuser
+      run: |
+        docker run -u sbtuser -w /home/sbtuser "${{ steps.create_docker_tag.outputs.TAG }}" /bin/bash -c "scala --version && sbt --script-version"
+    - name: Log in to DockerHub
+      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+      uses: docker/login-action@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Rebuild and push ${{ matrix.javaImage.platforms }} docker images
+      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+      uses: docker/build-push-action@v7
+      with:
+        context: ${{ matrix.javaImage.dockerContext }}
+        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
+        tags: ${{ steps.create_docker_tag.outputs.TAG }}
+        build-args: |
+          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
+          SBT_VERSION=${{ env.SBT_VERSION }}
+          SCALA_VERSION=${{ matrix.scalaVersion }}
+        platforms: ${{ matrix.javaImage.platforms }}
+        push: true
