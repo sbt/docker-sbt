@@ -55,6 +55,13 @@ COPY --from=builder /usr/local/bin/sbt /usr/local/bin/sbt
 
 # Add and use user sbtuser
 RUN addgroup -g $GROUP_ID sbtuser && adduser -D -u $USER_ID -G sbtuser sbtuser
+ENV HOME=/home/sbtuser
+# Allow running the image as an arbitrary uid (not only sbtuser): own sbtuser's
+# home by the root group (gid 0, which `docker run -u <uid>` joins by default)
+# and set the setgid bit, so files written by the warm cache below inherit gid 0;
+# with `umask 0002` there they are created group-writable (no recursive chmod,
+# which would copy the whole cache into a new layer).
+RUN mkdir -p /home/sbtuser && chown sbtuser:0 /home/sbtuser && chmod 2775 /home/sbtuser
 USER sbtuser
 
 # Switch working directory
@@ -64,6 +71,7 @@ ENV PATH="/usr/share/scala/bin:${PATH}"
 
 # Prepare sbt (warm cache)
 RUN \
+  umask 0002 && \
   sbt --script-version && \
   mkdir -p project && \
   echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \

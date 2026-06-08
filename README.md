@@ -59,6 +59,14 @@ The container is prepared to be used with a non-root user called `sbtuser`
 docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
 ```
 
+You can also run as an arbitrary user id. `HOME` is set to `/home/sbtuser`, whose
+contents are group-writable for the root group (gid 0) that an arbitrary
+`-u <uid>` belongs to by default:
+
+```
+docker run -it --rm -u 1234 -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
+```
+
 ## Automated updates with Renovate ##
 
 Because the tags combine three independent versions (`<JDK>_<sbt>_<Scala>`),
