@@ -1,0 +1,72 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard"
+  ],
+  "github-actions": {
+    "description": "Action `uses:` versions are handled by Dependabot instead",
+    "enabled": false
+  },
+  "dockerfile": {
+    "description": "Base images are pinned via the build matrix in build.yml, not the Dockerfiles",
+    "enabled": false
+  },
+  "docker-compose": {
+    "enabled": false
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "JDK base images in the build matrix (one entry per `# renovate:` comment)",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/build\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s+- dockerContext: '[^']+'(?:\\s+dockerfile: '[^']+')?\\s+baseImageTag: '(?<currentValue>[^']+)'"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Scala versions in the build matrix (one entry per `# renovate:` comment)",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/build\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s+- '(?<currentValue>[^']+)'"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "sbt version baked into every image (SBT_VERSION env var)",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/build\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s+SBT_VERSION: '(?<currentValue>[^']+)'"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Keep each base image on its current major (parallel JDK majors are intentional)",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Keep each Scala version on its current minor branch (patch updates only)",
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["scala/scala", "scala/scala3"],
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
+    },
+    {
+      "description": "Keep sbt on the 1.x line (2.0 is added as a separate matrix dimension)",
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["sbt/sbt"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ]
+}

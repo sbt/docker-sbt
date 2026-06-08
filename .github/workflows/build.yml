@@ -14,90 +14,93 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # sbt is baked into every image; kept on the 1.x line by Renovate (see
+      # .github/renovate.json). A 2.0-RC matrix dimension is tracked separately.
+      # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
+      SBT_VERSION: '1.12.11'
     strategy:
       fail-fast: false
       matrix:
-        scalaVersion: ['2.12.21', '2.13.18', '3.3.7', '3.8.4']
-        javaTag: [
-          'graalvm-community-25.0.1',
-          'graalvm-community-21.0.2',
-          'graalvm-ce-22.3.3-b1-java17',
-          'eclipse-temurin-25.0.1_8',
-          'eclipse-temurin-24.0.1_9',
-          'eclipse-temurin-21.0.8_9',
-          'eclipse-temurin-17.0.15_6',
-          'eclipse-temurin-alpine-25.0.1_8',
-          'eclipse-temurin-alpine-24.0.1_9',
-          'eclipse-temurin-alpine-21.0.8_9',
-          'eclipse-temurin-alpine-17.0.15_6',
-          'amazoncorretto-al2023-25.0.80',
-          'amazoncorretto-al2023-21.0.8',
-          'amazoncorretto-al2023-17.0.16'
-        ]
-        include:
+        # Renovate keeps each Scala version on its own minor branch (patch updates
+        # only); see .github/renovate.json. The published tag uses these verbatim.
+        scalaVersion:
+          # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+          - '2.12.21'
+          # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+          - '2.13.18'
+          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+          - '3.3.7'
+          # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+          - '3.8.4'
+        # baseImageTag is the single source of truth for each base image version
+        # (Renovate updates it, pinned to the major in the comment). The public
+        # image label (the "<java>" part of the tag) is derived from it in the
+        # "Compute java tag" step below, so versions are maintained in one place.
+        javaImage:
           # https://github.com/graalvm/container/pkgs/container/graalvm-community
-          - javaTag: 'graalvm-community-25.0.1'
-            dockerContext: 'graalvm-community'
+          # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+          - dockerContext: 'graalvm-community'
             baseImageTag: '25.0.1-ol10'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'graalvm-community-21.0.2'
-            dockerContext: 'graalvm-community'
+          # renovate: datasource=docker depName=ghcr.io/graalvm/graalvm-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+          - dockerContext: 'graalvm-community'
             baseImageTag: '21.0.2-ol9'
             platforms: 'linux/amd64,linux/arm64'
           # https://github.com/graalvm/container/pkgs/container/graalvm-ce
-          - javaTag: 'graalvm-ce-22.3.3-b1-java17'
-            dockerContext: 'graalvm-ce'
+          # graalvm-ce is EOL and intentionally pinned (no renovate comment -> not tracked)
+          - dockerContext: 'graalvm-ce'
             baseImageTag: 'ol9-java17-22.3.3-b1'
             platforms: 'linux/amd64,linux/arm64'
           # https://hub.docker.com/_/eclipse-temurin/tags
-          - javaTag: 'eclipse-temurin-25.0.1_8'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+          - dockerContext: 'eclipse-temurin'
             baseImageTag: '25.0.1_8-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-24.0.1_9'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+          - dockerContext: 'eclipse-temurin'
             baseImageTag: '24.0.1_9-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-21.0.8_9'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+          - dockerContext: 'eclipse-temurin'
             baseImageTag: '21.0.8_9-jdk'
             platforms: 'linux/amd64,linux/arm64'
-          - javaTag: 'eclipse-temurin-17.0.15_6'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+          - dockerContext: 'eclipse-temurin'
             baseImageTag: '17.0.15_6-jdk'
             platforms: 'linux/amd64,linux/arm64'
           # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
-          - javaTag: 'eclipse-temurin-alpine-25.0.1_8'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+          - dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '25.0.1_8-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-24.0.1_9'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+          - dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '24.0.1_9-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-21.0.8_9'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+          - dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '21.0.8_9-jdk-alpine'
             platforms: 'linux/amd64,linux/arm64/v8'
-          - javaTag: 'eclipse-temurin-alpine-17.0.15_6'
-            dockerContext: 'eclipse-temurin'
+          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+          - dockerContext: 'eclipse-temurin'
             dockerfile: 'alpine.Dockerfile'
             baseImageTag: '17.0.15_6-jdk-alpine'
             platforms: 'linux/amd64'
           # https://hub.docker.com/_/amazoncorretto/tags
-          - javaTag: 'amazoncorretto-al2023-25.0.80'
-            dockerContext: 'amazoncorretto'
+          # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
+          - dockerContext: 'amazoncorretto'
             baseImageTag: '25.0.0-al2023'
             platforms: 'linux/amd64'
-          - javaTag: 'amazoncorretto-al2023-21.0.8'
-            dockerContext: 'amazoncorretto'
+          # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
+          - dockerContext: 'amazoncorretto'
             baseImageTag: '21.0.8-al2023'
             platforms: 'linux/amd64'
-          - javaTag: 'amazoncorretto-al2023-17.0.16'
-            dockerContext: 'amazoncorretto'
+          # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
+          - dockerContext: 'amazoncorretto'
             baseImageTag: '17.0.16-al2023'
             platforms: 'linux/amd64'
     steps:
@@ -111,31 +114,50 @@ jobs:
       #        install: true
     - name: Available platforms
       run: echo ${{ steps.buildx.outputs.platforms }}
-    - name: Get latest SBT version
-      id: get_sbt_version
+    - name: Compute java tag
+      id: java_tag
+      # Derive the public "<java>" part of the image tag from baseImageTag so the
+      # version is only maintained in one place (the matrix above).
+      env:
+        DOCKER_CONTEXT: ${{ matrix.javaImage.dockerContext }}
+        BASE_IMAGE_TAG: ${{ matrix.javaImage.baseImageTag }}
       run: |
-        SBT_VERSION=$(
-          curl --silent -L https://github.com/sbt/sbt/releases |
-          grep -i -w -o '>[0-9]*\.[0-9]*\.[0-9]*</a>' |
-          grep -i -w -o '[0-9]*\.[0-9]*\.[0-9]*' |
-          sort --version-sort | tail -n 1)
-        [[ -z "$SBT_VERSION" ]] && { echo "Failed to get latest sbt version" ; exit 1; }
-        echo "VERSION=$SBT_VERSION" >> $GITHUB_OUTPUT
+        case "$DOCKER_CONTEXT" in
+          eclipse-temurin)
+            if [[ "$BASE_IMAGE_TAG" == *-jdk-alpine ]]; then
+              JAVA_TAG="eclipse-temurin-alpine-${BASE_IMAGE_TAG%-jdk-alpine}"
+            else
+              JAVA_TAG="eclipse-temurin-${BASE_IMAGE_TAG%-jdk}"
+            fi
+            ;;
+          graalvm-community)
+            JAVA_TAG="graalvm-community-${BASE_IMAGE_TAG%-ol*}"
+            ;;
+          amazoncorretto)
+            JAVA_TAG="amazoncorretto-al2023-${BASE_IMAGE_TAG%-al2023}"
+            ;;
+          graalvm-ce)
+            JAVA_TAG="graalvm-ce-${BASE_IMAGE_TAG}"
+            ;;
+          *)
+            echo "Unknown dockerContext: $DOCKER_CONTEXT" >&2 ; exit 1 ;;
+        esac
+        echo "JAVA_TAG=$JAVA_TAG" >> $GITHUB_OUTPUT
     - name: Create docker tag
       id: create_docker_tag
       run: |
-        TAG=sbtscala/scala-sbt:${{ matrix.javaTag }}_${{ steps.get_sbt_version.outputs.VERSION }}_${{ matrix.scalaVersion }}
+        TAG=sbtscala/scala-sbt:${{ steps.java_tag.outputs.JAVA_TAG }}_${{ env.SBT_VERSION }}_${{ matrix.scalaVersion }}
         echo "TAG=$TAG" >> $GITHUB_OUTPUT
     - name: Build docker image
       uses: docker/build-push-action@v7
       with:
-        context: ${{ matrix.dockerContext }}
+        context: ${{ matrix.javaImage.dockerContext }}
         no-cache: true
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
-        file: ${{ matrix.dockerContext }}/${{ matrix.dockerfile || 'Dockerfile' }}
+        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
         build-args: |
-          BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
-          SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }}
+          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
+          SBT_VERSION=${{ env.SBT_VERSION }}
           SCALA_VERSION=${{ matrix.scalaVersion }}
         load: true
     - name: Test docker image as root (default)
@@ -154,16 +176,16 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Rebuild and push ${{ matrix.platforms }} docker images
+    - name: Rebuild and push ${{ matrix.javaImage.platforms }} docker images
       if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
       uses: docker/build-push-action@v7
       with:
-        context: ${{ matrix.dockerContext }}
-        file: ${{ matrix.dockerContext }}/${{ matrix.dockerfile || 'Dockerfile' }}
+        context: ${{ matrix.javaImage.dockerContext }}
+        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
         build-args: |
-          BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
-          SBT_VERSION=${{ steps.get_sbt_version.outputs.VERSION }}
+          BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
+          SBT_VERSION=${{ env.SBT_VERSION }}
           SCALA_VERSION=${{ matrix.scalaVersion }}
-        platforms: ${{ matrix.platforms }}
+        platforms: ${{ matrix.javaImage.platforms }}
         push: true
