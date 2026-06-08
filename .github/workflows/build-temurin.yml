@@ -109,6 +109,9 @@ jobs:
     - name: Test image scala as sbtuser
       if: ${{ !startsWith(matrix.scala, '2.12') }}
       run: docker run --rm -u sbtuser -w /home/sbtuser scala-sbt:test /bin/bash -c "scala --version && sbt --script-version"
+    - name: Test image launches as an arbitrary uid (issue #258)
+      # full sbt launch (not --script-version) so it exercises temp/HOME writes
+      run: docker run --rm -u 1234 -w /home/sbtuser scala-sbt:test sbt --allow-empty exit
     - name: Log in to DockerHub
       if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
       uses: docker/login-action@v4
