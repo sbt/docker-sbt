@@ -25,14 +25,14 @@ Older tags are available at: https://hub.docker.com/r/hseeberger/scala-sbt/tags
 1. Install [Docker](https://www.docker.com)
 2. Pull [automated build](https://hub.docker.com/r/sbtscala/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
-docker pull sbtscala/scala-sbt:eclipse-temurin-17.0.4_1.7.1_3.2.0
+docker pull sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
 ```
 Alternatively, you can build an image from the remote Dockerfile:
 ```
 docker build \
-  --build-arg BASE_IMAGE_TAG="17.0.4.1_1-jdk" \
-  --build-arg SBT_VERSION="1.7.1" \
-  --build-arg SCALA_VERSION="3.2.0" \
+  --build-arg BASE_IMAGE_TAG="21.0.8_9-jdk" \
+  --build-arg SBT_VERSION="1.12.11" \
+  --build-arg SCALA_VERSION="3.8.4" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
   -t sbtscala/scala-sbt \
@@ -42,21 +42,21 @@ docker build \
 ## Usage ##
 
 ```
-docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-17.0.4_1.7.1_3.2.0
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
 ```
 
 ### Alternative commands ###
 The container contains `bash`, `scala` and `sbt`.
 
 ```
-docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-17.0.4_1.7.1_3.2.0 scala
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4 scala
 ```
 
 ### Non-root ###
 The container is prepared to be used with a non-root user called `sbtuser`
 
 ```
-docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-17.0.4_1.7.1_3.2.0
+docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
 ```
 
 ## Automated updates with Renovate ##
