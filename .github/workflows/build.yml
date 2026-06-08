@@ -119,12 +119,9 @@ jobs:
           SCALA_VERSION=${{ matrix.scala }}
         cache-to: type=gha,mode=max,scope=${{ matrix.label }}-${{ matrix.sbt }}-${{ matrix.scala }}-${{ matrix.platformId }}
     - name: Test image as root (default)
-      if: ${{ !startsWith(matrix.scala, '2.12') }}
-      # scala --version does not work on < 2.13
-      run: docker run --rm scala-sbt:test /bin/bash -c "scala --version && sbt --script-version"
-    - name: Test image scala as sbtuser
-      if: ${{ !startsWith(matrix.scala, '2.12') }}
-      run: docker run --rm -u sbtuser -w /home/sbtuser scala-sbt:test /bin/bash -c "scala --version && sbt --script-version"
+      run: docker run --rm scala-sbt:test sbt --script-version
+    - name: Test image as sbtuser
+      run: docker run --rm -u sbtuser -w /home/sbtuser scala-sbt:test sbt --script-version
     - name: Test image launches as an arbitrary uid (issue #258)
       # write a build file (also checks the home dir is writable) then fully
       # launch sbt, which exercises the temp/HOME writes that previously failed
