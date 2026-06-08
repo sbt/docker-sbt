@@ -1,0 +1,62 @@
+# Build matrix data for the eclipse-temurin images, consumed by the native-runner
+# pipeline in .github/workflows/build-temurin.yml.
+#
+# Line shapes intentionally match the matrix in build.yml so the same Renovate
+# managers track them (see .github/renovate.json). During the Option 2 rollout
+# SBT_VERSION and scalaVersion are still also defined in build.yml for the
+# not-yet-migrated variants; Renovate keeps the copies in sync.
+
+# renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
+SBT_VERSION: '1.12.11'
+
+scalaVersion:
+  # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+  - '2.12.21'
+  # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+  - '2.13.18'
+  # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+  - '3.3.7'
+  # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+  - '3.8.4'
+
+# eclipse-temurin base images. `platforms` (comma separated) drives the per-arch
+# native build fan-out; the public "<java>" tag label is derived from baseImageTag.
+javaImage:
+  # https://hub.docker.com/_/eclipse-temurin/tags
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  - dockerContext: 'eclipse-temurin'
+    baseImageTag: '25.0.1_8-jdk'
+    platforms: 'linux/amd64,linux/arm64'
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  - dockerContext: 'eclipse-temurin'
+    baseImageTag: '24.0.1_9-jdk'
+    platforms: 'linux/amd64,linux/arm64'
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  - dockerContext: 'eclipse-temurin'
+    baseImageTag: '21.0.8_9-jdk'
+    platforms: 'linux/amd64,linux/arm64'
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  - dockerContext: 'eclipse-temurin'
+    baseImageTag: '17.0.15_6-jdk'
+    platforms: 'linux/amd64,linux/arm64'
+  # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+  - dockerContext: 'eclipse-temurin'
+    dockerfile: 'alpine.Dockerfile'
+    baseImageTag: '25.0.1_8-jdk-alpine'
+    platforms: 'linux/amd64,linux/arm64/v8'
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+  - dockerContext: 'eclipse-temurin'
+    dockerfile: 'alpine.Dockerfile'
+    baseImageTag: '24.0.1_9-jdk-alpine'
+    platforms: 'linux/amd64,linux/arm64/v8'
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+  - dockerContext: 'eclipse-temurin'
+    dockerfile: 'alpine.Dockerfile'
+    baseImageTag: '21.0.8_9-jdk-alpine'
+    platforms: 'linux/amd64,linux/arm64/v8'
+  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+  - dockerContext: 'eclipse-temurin'
+    dockerfile: 'alpine.Dockerfile'
+    baseImageTag: '17.0.15_6-jdk-alpine'
+    platforms: 'linux/amd64'
