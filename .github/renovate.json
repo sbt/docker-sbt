@@ -20,7 +20,8 @@
       "customType": "regex",
       "description": "JDK base images in the build matrix (one entry per `# renovate:` comment)",
       "managerFilePatterns": [
-        "/^\\.github/workflows/build\\.yml$/"
+        "/^\\.github/workflows/build\\.yml$/",
+        "/^\\.github/images\\.yml$/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s+- dockerContext: '[^']+'(?:\\s+dockerfile: '[^']+')?\\s+baseImageTag: '(?<currentValue>[^']+)'"
@@ -30,7 +31,8 @@
       "customType": "regex",
       "description": "Scala versions in the build matrix (one entry per `# renovate:` comment)",
       "managerFilePatterns": [
-        "/^\\.github/workflows/build\\.yml$/"
+        "/^\\.github/workflows/build\\.yml$/",
+        "/^\\.github/images\\.yml$/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s+- '(?<currentValue>[^']+)'"
@@ -40,7 +42,8 @@
       "customType": "regex",
       "description": "sbt version baked into every image (SBT_VERSION env var)",
       "managerFilePatterns": [
-        "/^\\.github/workflows/build\\.yml$/"
+        "/^\\.github/workflows/build\\.yml$/",
+        "/^\\.github/images\\.yml$/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s+SBT_VERSION: '(?<currentValue>[^']+)'"

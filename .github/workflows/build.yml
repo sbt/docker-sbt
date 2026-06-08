@@ -52,44 +52,8 @@ jobs:
           - dockerContext: 'graalvm-ce'
             baseImageTag: 'ol9-java17-22.3.3-b1'
             platforms: 'linux/amd64,linux/arm64'
-          # https://hub.docker.com/_/eclipse-temurin/tags
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-          - dockerContext: 'eclipse-temurin'
-            baseImageTag: '25.0.1_8-jdk'
-            platforms: 'linux/amd64,linux/arm64'
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-          - dockerContext: 'eclipse-temurin'
-            baseImageTag: '24.0.1_9-jdk'
-            platforms: 'linux/amd64,linux/arm64'
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-          - dockerContext: 'eclipse-temurin'
-            baseImageTag: '21.0.8_9-jdk'
-            platforms: 'linux/amd64,linux/arm64'
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-          - dockerContext: 'eclipse-temurin'
-            baseImageTag: '17.0.15_6-jdk'
-            platforms: 'linux/amd64,linux/arm64'
-          # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
-          - dockerContext: 'eclipse-temurin'
-            dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '25.0.1_8-jdk-alpine'
-            platforms: 'linux/amd64,linux/arm64/v8'
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
-          - dockerContext: 'eclipse-temurin'
-            dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '24.0.1_9-jdk-alpine'
-            platforms: 'linux/amd64,linux/arm64/v8'
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
-          - dockerContext: 'eclipse-temurin'
-            dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '21.0.8_9-jdk-alpine'
-            platforms: 'linux/amd64,linux/arm64/v8'
-          # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
-          - dockerContext: 'eclipse-temurin'
-            dockerfile: 'alpine.Dockerfile'
-            baseImageTag: '17.0.15_6-jdk-alpine'
-            platforms: 'linux/amd64'
+          # NOTE: eclipse-temurin is built by .github/workflows/build-temurin.yml
+          # (native-runner pipeline, see issue #166 / .github/images.yml).
           # https://hub.docker.com/_/amazoncorretto/tags
           # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
           - dockerContext: 'amazoncorretto'
@@ -154,7 +118,7 @@ jobs:
         context: ${{ matrix.javaImage.dockerContext }}
         no-cache: true
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
-        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
+        file: ${{ matrix.javaImage.dockerContext }}/Dockerfile
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
           SBT_VERSION=${{ env.SBT_VERSION }}
@@ -181,7 +145,7 @@ jobs:
       uses: docker/build-push-action@v7
       with:
         context: ${{ matrix.javaImage.dockerContext }}
-        file: ${{ matrix.javaImage.dockerContext }}/${{ matrix.javaImage.dockerfile || 'Dockerfile' }}
+        file: ${{ matrix.javaImage.dockerContext }}/Dockerfile
         tags: ${{ steps.create_docker_tag.outputs.TAG }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.javaImage.baseImageTag }}
