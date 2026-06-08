@@ -55,6 +55,13 @@
       "enabled": false
     },
     {
+      "description": "GraalVM CE only maintains the latest line, so track it across majors",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/graalvm/graalvm-community", "ghcr.io/graalvm/jdk-community"],
+      "matchUpdateTypes": ["major"],
+      "enabled": true
+    },
+    {
       "description": "Keep each Scala version on its current minor branch (patch updates only)",
       "matchDatasources": ["github-releases"],
       "matchPackageNames": ["scala/scala", "scala/scala3"],
