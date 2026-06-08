@@ -47,6 +47,15 @@ jobs:
           - dockerContext: 'graalvm-community'
             baseImageTag: '21.0.2-ol9'
             platforms: 'linux/amd64,linux/arm64'
+          # Size-compact GraalVM JDK (no native-image). https://github.com/graalvm/container/pkgs/container/jdk-community
+          # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+          - dockerContext: 'graalvm-jdk-community'
+            baseImageTag: '25.0.1-ol10'
+            platforms: 'linux/amd64,linux/arm64'
+          # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol\d+$
+          - dockerContext: 'graalvm-jdk-community'
+            baseImageTag: '21.0.2-ol9'
+            platforms: 'linux/amd64,linux/arm64'
           # https://github.com/graalvm/container/pkgs/container/graalvm-ce
           # graalvm-ce is EOL and intentionally pinned (no renovate comment -> not tracked)
           - dockerContext: 'graalvm-ce'
@@ -96,6 +105,9 @@ jobs:
             ;;
           graalvm-community)
             JAVA_TAG="graalvm-community-${BASE_IMAGE_TAG%-ol*}"
+            ;;
+          graalvm-jdk-community)
+            JAVA_TAG="graalvm-jdk-community-${BASE_IMAGE_TAG%-ol*}"
             ;;
           amazoncorretto)
             JAVA_TAG="amazoncorretto-al2023-${BASE_IMAGE_TAG%-al2023}"
