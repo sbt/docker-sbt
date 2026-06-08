@@ -1,5 +1,11 @@
 name: Build
 
+# Cancel a superseded in-progress run when a PR is updated by a newer push.
+# Scoped to pull_request so master/scheduled publishes are never interrupted.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   push:
     branches:
