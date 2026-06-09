@@ -46,11 +46,16 @@ docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
 ```
 
 ### Alternative commands ###
-The container contains `bash`, `scala` and `sbt`.
+The container contains `bash` and `sbt`.
 
 ```
-docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4 scala
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4 bash
 ```
+
+The standalone `scala` CLI is not bundled: sbt resolves its own Scala per project,
+so it was unused for sbt builds. If you want Scala without sbt (scripts, the REPL),
+use the [Scala CLI](https://github.com/VirtusLab/scala-cli) image
+[`virtuslab/scala-cli`](https://hub.docker.com/r/virtuslab/scala-cli).
 
 ### Non-root ###
 The container is prepared to be used with a non-root user called `sbtuser`

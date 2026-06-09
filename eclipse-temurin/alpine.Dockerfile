@@ -1,6 +1,6 @@
 # Use a multi-stage build to reduce the size of the final image
-# The builder will install curl, bc and ca-certificates which are needed to install sbt and scala.
-# The final image will only contain bash, git, rpm, sbt and scala.
+# The builder will install curl, bc and ca-certificates which are needed to install sbt.
+# The final image will only contain bash, git, rpm and sbt.
 
 ARG BASE_IMAGE_TAG
 FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine} AS builder
@@ -9,7 +9,6 @@ ARG SCALA_VERSION=3.4.0
 ARG SBT_VERSION=1.10.7
 ARG USER_ID=1001
 ARG GROUP_ID=1001
-ENV SCALA_HOME=/usr/share/scala
 
 # Install dependencies
 RUN apk add wget ca-certificates bash curl bc
@@ -23,22 +22,6 @@ RUN \
     ln -s /usr/local/sbt/bin/* /usr/local/bin/ && \
     sbt --script-version
 
-# Install scala
-RUN \
-  cd "/tmp" && \
-  case $SCALA_VERSION in \
-    2.*) URL=https://github.com/scala/scala/releases/download/v$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=/usr/share/scala-$SCALA_VERSION ;; \
-    *) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION ;; \
-  esac && \
-  curl -fsL --show-error $URL | tar xfz - -C /usr/share && \
-  mv $SCALA_DIR $SCALA_HOME && \
-  ln -s "$SCALA_HOME/bin/"* "/usr/bin/" && \
-  scala -version && \
-  case $SCALA_VERSION in \
-    2*) echo "println(util.Properties.versionMsg)" > test.scala && scala -nocompdaemon test.scala ;; \
-    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[?, ?]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala && scala --server=false test.scala ;; \
-  esac && rm test.scala
-
 # Start a new stage for the final image
 FROM eclipse-temurin:${BASE_IMAGE_TAG:-21.0.2_13-jdk-alpine}
 
@@ -49,7 +32,6 @@ ARG GROUP_ID=1001
 
 RUN apk add --no-cache bash git rpm
 
-COPY --from=builder /usr/share/scala /usr/share/scala
 COPY --from=builder /usr/local/sbt /usr/local/sbt
 COPY --from=builder /usr/local/bin/sbt /usr/local/bin/sbt
 
@@ -66,8 +48,6 @@ USER sbtuser
 
 # Switch working directory
 WORKDIR /home/sbtuser
-
-ENV PATH="/usr/share/scala/bin:${PATH}"
 
 # Prepare sbt (warm cache)
 RUN \

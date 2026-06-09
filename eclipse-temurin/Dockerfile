@@ -33,22 +33,6 @@ RUN \
   chmod -R 755 /usr/share/sbt && \
   ln -s /usr/share/sbt/bin/sbt /usr/local/bin/sbt
 
-# Install Scala
-RUN \
-  case $SCALA_VERSION in \
-    2.*) URL=https://github.com/scala/scala/releases/download/v$SCALA_VERSION/scala-$SCALA_VERSION.tgz SCALA_DIR=/usr/share/scala-$SCALA_VERSION ;; \
-    *) URL=https://github.com/scala/scala3/releases/download/$SCALA_VERSION/scala3-$SCALA_VERSION.tar.gz SCALA_DIR=/usr/share/scala3-$SCALA_VERSION ;; \
-  esac && \
-  curl -fsL --show-error $URL | tar xfz - -C /usr/share/ && \
-  mv $SCALA_DIR /usr/share/scala && \
-  chown -R root:root /usr/share/scala && \
-  chmod -R 755 /usr/share/scala && \
-  ln -s /usr/share/scala/bin/* /usr/local/bin && \
-  case $SCALA_VERSION in \
-    2*) echo "println(util.Properties.versionMsg)" > test.scala && scala -nocompdaemon test.scala ;; \
-    *) echo 'import java.io.FileInputStream;import java.util.jar.JarInputStream;val scala3LibJar = classOf[CanEqual[?, ?]].getProtectionDomain.getCodeSource.getLocation.toURI.getPath;val manifest = new JarInputStream(new FileInputStream(scala3LibJar)).getManifest;val ver = manifest.getMainAttributes.getValue("Implementation-Version");@main def main = println(s"Scala version ${ver}")' > test.scala && scala --server=false test.scala ;; \
-  esac && rm test.scala
-
 # Symlink java to have it available on sbtuser's PATH
 RUN ln -s /opt/java/openjdk/bin/java /usr/local/bin/java
 
