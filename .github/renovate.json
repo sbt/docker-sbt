@@ -28,7 +28,7 @@
     },
     {
       "customType": "regex",
-      "description": "Scala versions in the build matrix (one entry per `# renovate:` comment)",
+      "description": "Scala versions and the light-image sbt versions (any `# renovate:` list entry)",
       "managerFilePatterns": [
         "/^\\.github/images\\.yml$/"
       ],
