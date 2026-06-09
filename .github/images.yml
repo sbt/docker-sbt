@@ -6,9 +6,25 @@
 #   platforms   - comma-separated build platforms (drives the per-arch fan-out)
 #   dropScala   - list of "major.minor" prefixes to NOT build for this image
 #   sbt         - sbt version override (default: the top-level SBT_VERSION)
+#   light       - also build "light" images for this entry: sbt only, no Scala
+#                 warm step (sbt is pre-warmed by its distribution). Built once
+#                 per `lightSbt` version and published under rolling tags only:
+#                 <java-major>_<sbt-line> and <java-full>_<sbt-line>, e.g.
+#                 eclipse-temurin-25_1.x and eclipse-temurin-25.0.1_8_1.x. The
+#                 exact sbt version is never in the tag (sbt releases ~monthly
+#                 and the user's project/build.properties picks it anyway); we
+#                 still pin it here so the warm cache is reproducible/rollbackable.
 
 # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
 SBT_VERSION: '1.12.11'
+
+# Latest sbt version per line, used to warm the light images. One entry per major
+# line (the rolling <java>_<line> tag would be ambiguous otherwise).
+lightSbt:
+  # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
+  - '1.12.11'
+  # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-RC(?<build>\\d+)$
+  - '2.0.0-RC15'
 
 scalaVersion:
   # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
@@ -21,36 +37,42 @@ scalaVersion:
   - '3.8.4'
 
 javaImage:
-  # ===== eclipse-temurin =====
+  # ===== eclipse-temurin (also published as light images) =====
   # https://hub.docker.com/_/eclipse-temurin/tags
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
     baseImageTag: '25.0.3_9-jdk'
     platforms: 'linux/amd64,linux/arm64'
+    light: true
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
     baseImageTag: '21.0.11_10-jdk'
     platforms: 'linux/amd64,linux/arm64'
+    light: true
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
     baseImageTag: '17.0.19_10-jdk'
     platforms: 'linux/amd64,linux/arm64'
+    light: true
   # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '25.0.3_9-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
+    light: true
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '21.0.11_10-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
+    light: true
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '17.0.19_10-jdk-alpine'
     platforms: 'linux/amd64'
+    light: true
 
   # ===== graalvm-community (GraalVM users skew modern: no Scala 2.12) =====
   # GraalVM CE only maintains the latest line (no LTS backports), so a pinned
@@ -86,23 +108,3 @@ javaImage:
   - dockerContext: 'amazoncorretto'
     baseImageTag: '17.0.19-al2023'
     platforms: 'linux/amd64'
-
-  # ===== sbt 2.0 release-candidate preview (eclipse-temurin LTS + latest, Scala 3 only) =====
-  # amd64 only: sbt 2.0 leaves a background server writing into target/ after the
-  # client returns, which races the warm-cache cleanup (`rm -r target`) on fast
-  # native arm64. Revisit (and restore arm64) once the warm cache shuts the
-  # sbt server down before cleanup.
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-  - dockerContext: 'eclipse-temurin'
-    baseImageTag: '25.0.3_9-jdk'
-    platforms: 'linux/amd64'
-    dropScala: ['2.12', '2.13']
-    # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-RC(?<build>\d+)$
-    sbt: '2.0.0-RC15'
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
-  - dockerContext: 'eclipse-temurin'
-    baseImageTag: '21.0.11_10-jdk'
-    platforms: 'linux/amd64'
-    dropScala: ['2.12', '2.13']
-    # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-RC(?<build>\d+)$
-    sbt: '2.0.0-RC15'

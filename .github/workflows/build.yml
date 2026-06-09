@@ -43,10 +43,13 @@ jobs:
       id: gen
       run: |
         data=$(yq -o=json '.' .github/images.yml)
-        # jq helpers: derive the public "<java>" tag label per distro, and the
-        # Scala versions to build for an image (global list minus its dropScala
-        # "major.minor" prefixes). Duplicated in both programs as jq has no shared
-        # library here.
+        # jq helpers (duplicated in both programs; jq has no shared library here):
+        #   imageLabel  - public "<java>" tag label, full JDK version (e.g.
+        #                 eclipse-temurin-25.0.1_8, eclipse-temurin-alpine-25.0.1_8)
+        #   majorLabel  - same but only the JDK major (e.g. eclipse-temurin-25)
+        #   scalasFor   - Scala versions to build for an image (global list minus
+        #                 the image's dropScala "major.minor" prefixes)
+        #   sbtLine     - rolling line for an sbt version (1.12.11 -> 1.x)
         defs='
           def imageLabel($img):
             $img.dockerContext as $c | $img.baseImageTag as $t
@@ -57,44 +60,63 @@ jobs:
               elif $c == "graalvm-jdk-community" then "graalvm-jdk-community-" + ($t | sub("-ol[0-9]+$";""))
               elif $c == "amazoncorretto" then "amazoncorretto-al2023-" + ($t | sub("-al2023$";""))
               else error("unknown dockerContext: \($c)") end;
+          def majorLabel($img):
+            ($img.baseImageTag | capture("^(?<m>[0-9]+)").m) as $maj
+            | (imageLabel($img) | sub("[0-9].*$"; $maj));
           def scalasFor($root; $img):
             [ $root.scalaVersion[] | . as $s
               | select([ ($img.dropScala // [])[] as $p | $s | startswith($p) ] | any | not) ];
+          def sbtLine($sbt): ($sbt | capture("^(?<m>[0-9]+)").m) + ".x";
         '
-        # build matrix: one job per scala x image x platform (native runner per arch)
+        # build matrix: fat (javaImage x scala) + light (light:true x lightSbt),
+        # one job per (image, sbt[, scala], platform). `key` is the build identity
+        # used for the cache scope and digest artifact name. For fat it is also the
+        # published tag (<java>_<sbt>_<scala>); for light it is <java-full>_<sbt>
+        # (exact sbt, unique per build) while the published tags are rolling lines
+        # assembled in the merge job. Empty scala -> no Scala warm step (Dockerfile).
         build=$(echo "$data" | jq -c "$defs"'
+          def entry($img; $scala; $sbt; $key; $platform):
+            { scala: $scala,
+              context: $img.dockerContext,
+              dockerfile: ($img.dockerfile // "Dockerfile"),
+              baseImageTag: $img.baseImageTag,
+              key: $key,
+              platform: $platform,
+              platformId: ($platform | sub("^linux/";"") | gsub("/";"-")),
+              runner: (if ($platform | startswith("linux/arm64")) then "ubuntu-24.04-arm" else "ubuntu-24.04" end),
+              sbt: $sbt };
           . as $root
-          | [ $root.javaImage[] as $img
-              | (scalasFor($root; $img))[] as $scala
-              | ($img.platforms | split(",")[]) as $platform
-              | {
-                  scala: $scala,
-                  context: $img.dockerContext,
-                  dockerfile: ($img.dockerfile // "Dockerfile"),
-                  baseImageTag: $img.baseImageTag,
-                  label: imageLabel($img),
-                  platform: $platform,
-                  platformId: ($platform | sub("^linux/";"") | gsub("/";"-")),
-                  runner: (if ($platform | startswith("linux/arm64")) then "ubuntu-24.04-arm" else "ubuntu-24.04" end),
-                  sbt: ($img.sbt // $root.SBT_VERSION)
-                } ]')
-        # merge matrix: one job per final tag (scala x image)
+          | ( [ $root.javaImage[] as $img
+                | (scalasFor($root; $img))[] as $scala
+                | ($img.sbt // $root.SBT_VERSION) as $sbt
+                | ($img.platforms | split(",")[]) as $platform
+                | entry($img; $scala; $sbt; (imageLabel($img) + "_" + $sbt + "_" + $scala); $platform) ]
+            + [ $root.javaImage[] as $img | select($img.light == true)
+                | $root.lightSbt[] as $sbt
+                | ($img.platforms | split(",")[]) as $platform
+                | entry($img; ""; $sbt; (imageLabel($img) + "_" + $sbt); $platform) ] )')
+        # merge matrix: one job per build identity (`key`, matches the digest
+        # artifacts) listing the published tags (`tags`, space-separated). Fat tags
+        # publish a single <java>_<sbt>_<scala>; light publishes two rolling tags
+        # per line: <java-major>_<line> and <java-full>_<line> on the same digests.
         merge=$(echo "$data" | jq -c "$defs"'
           . as $root
-          | [ $root.javaImage[] as $img
-              | (scalasFor($root; $img))[] as $scala
-              | {
-                  scala: $scala,
-                  label: imageLabel($img),
-                  platformCount: ($img.platforms | split(",") | length),
-                  sbt: ($img.sbt // $root.SBT_VERSION)
-                } ]')
+          | ( [ $root.javaImage[] as $img
+                | (scalasFor($root; $img))[] as $scala
+                | (imageLabel($img) + "_" + ($img.sbt // $root.SBT_VERSION) + "_" + $scala) as $t
+                | { key: $t, tags: $t, platformCount: ($img.platforms | split(",") | length) } ]
+            + [ $root.javaImage[] as $img | select($img.light == true)
+                | $root.lightSbt[] as $sbt
+                | sbtLine($sbt) as $line
+                | { key: (imageLabel($img) + "_" + $sbt),
+                    tags: (majorLabel($img) + "_" + $line + " " + imageLabel($img) + "_" + $line),
+                    platformCount: ($img.platforms | split(",") | length) } ] )')
         echo "build={\"include\":$build}" >> "$GITHUB_OUTPUT"
         echo "merge={\"include\":$merge}" >> "$GITHUB_OUTPUT"
     - name: Show matrices
       run: |
         echo '${{ steps.gen.outputs.build }}' | jq '.include | length as $n | "build jobs: \($n)"'
-        echo '${{ steps.gen.outputs.merge }}' | jq '.include | length as $n | "merge jobs (tags): \($n)"'
+        echo '${{ steps.gen.outputs.merge }}' | jq -r '.include[] | "  " + .tags'
 
   build:
     needs: prepare
@@ -119,7 +141,7 @@ jobs:
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
           SBT_VERSION=${{ matrix.sbt }}
           SCALA_VERSION=${{ matrix.scala }}
-        cache-to: type=gha,mode=max,scope=${{ matrix.label }}-${{ matrix.sbt }}-${{ matrix.scala }}-${{ matrix.platformId }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.key }}-${{ matrix.platformId }}
     - name: Test image as root (default)
       run: docker run --rm scala-sbt:test sbt --script-version
     - name: Test image as sbtuser
@@ -144,7 +166,7 @@ jobs:
         platforms: ${{ matrix.platform }}
         # Reuses the layers just built for the test above (same run, same scope),
         # so this does not rebuild from scratch.
-        cache-from: type=gha,scope=${{ matrix.label }}-${{ matrix.sbt }}-${{ matrix.scala }}-${{ matrix.platformId }}
+        cache-from: type=gha,scope=${{ matrix.key }}-${{ matrix.platformId }}
         build-args: |
           BASE_IMAGE_TAG=${{ matrix.baseImageTag }}
           SBT_VERSION=${{ matrix.sbt }}
@@ -160,7 +182,7 @@ jobs:
       if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
       uses: actions/upload-artifact@v7
       with:
-        name: digest-${{ matrix.label }}_${{ matrix.sbt }}_${{ matrix.scala }}-${{ matrix.platformId }}
+        name: digest-${{ matrix.key }}-${{ matrix.platformId }}
         path: /tmp/digests/*
         if-no-files-found: error
         retention-days: 1
@@ -175,11 +197,11 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.prepare.outputs.merge) }}
     steps:
-    - name: Download digests for ${{ matrix.label }} / scala ${{ matrix.scala }}
+    - name: Download digests for ${{ matrix.key }}
       uses: actions/download-artifact@v8
       with:
         path: /tmp/digests
-        pattern: digest-${{ matrix.label }}_${{ matrix.sbt }}_${{ matrix.scala }}-*
+        pattern: digest-${{ matrix.key }}-*
         merge-multiple: true
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4.1.0
@@ -192,7 +214,6 @@ jobs:
       working-directory: /tmp/digests
       run: |
         shopt -s nullglob
-        tag="${IMAGE}:${{ matrix.label }}_${{ matrix.sbt }}_${{ matrix.scala }}"
         digests=( * )
         expected=${{ matrix.platformCount }}
         # Fail (rather than silently skip) when not all architectures are present,
@@ -200,8 +221,13 @@ jobs:
         # the failed build re-uploads its digest and this job re-runs to push it.
         # fail-fast: false keeps this from affecting the other tags.
         if [ "${#digests[@]}" -ne "$expected" ]; then
-          echo "::error title=Incomplete::${#digests[@]}/${expected} architectures available for ${tag}; not publishing. Re-run the failed build job(s) then this job to recover."
+          echo "::error title=Incomplete::${#digests[@]}/${expected} architectures available for '${{ matrix.key }}'; not publishing. Re-run the failed build job(s) then this job to recover."
           exit 1
         fi
-        docker buildx imagetools create -t "$tag" "${digests[@]/#/${IMAGE}@sha256:}"
-        docker buildx imagetools inspect "$tag"
+        # One build can publish several tags (light images get rolling
+        # <java-major>_<line> and <java-full>_<line> on the same digests).
+        read -ra names <<< "${{ matrix.tags }}"
+        targs=()
+        for n in "${names[@]}"; do targs+=( -t "${IMAGE}:${n}" ); done
+        docker buildx imagetools create "${targs[@]}" "${digests[@]/#/${IMAGE}@sha256:}"
+        for n in "${names[@]}"; do docker buildx imagetools inspect "${IMAGE}:${n}"; done

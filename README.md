@@ -2,7 +2,25 @@
 
 This repository provides [sbt](http://www.scala-sbt.org) Docker files and images for building [Scala](http://www.scala-lang.org) projects. The images install sbt (which resolves the project's Scala version itself); a standalone `scala` CLI is not bundled.
 
-As we think referencing unstable versions is a bad idea we don't publish a `latest` tag. Our tags consists of three parts: `<JDK version>_<sbt version>_<Scala version>`.
+As we think referencing unstable versions is a bad idea we don't publish a `latest` tag. The full ("fat") tags consist of three parts: `<JDK version>_<sbt version>_<Scala version>`, where a trivial project is pre-compiled so the Scala compiler is also warmed.
+
+There are also **light** images (no Scala warmup). sbt resolves the Scala version your
+project needs at build time, so the Scala part is unnecessary; and your
+`project/build.properties` already pins the exact sbt, so the light tags only
+track the sbt *line* (`1.x` / `2.x`), which always rolls forward to the latest
+release. Each light image is published under two tags:
+
+* `<JDK major>_<sbt line>`, e.g. `eclipse-temurin-25_1.x` - JDK and sbt both roll
+  forward to the latest. Convenient, nothing to update.
+* `<JDK version>_<sbt line>`, e.g. `eclipse-temurin-25.0.1_8_1.x` - pin the JDK
+  (plain Dependabot can bump it), sbt still rolls.
+
+Light images are built for **sbt 1.x and sbt 2.x** (sbt 2.x requires JDK 17+).
+
+```
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-25_1.x          # light, JDK + sbt 1.x latest
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-25.0.1_8_2.x    # light, pinned JDK + sbt 2.x latest
+```
 
 Images are updated daily
 

@@ -9,8 +9,13 @@ ARG BASE_IMAGE_TAG
 FROM eclipse-temurin:${BASE_IMAGE_TAG:-11.0.16.1_1-jdk}
 
 # Env variables
-ARG SCALA_VERSION
-ENV SCALA_VERSION=${SCALA_VERSION:-2.13.10}
+# Default only applies when the build arg is unset (manual builds). The build
+# workflow passes SCALA_VERSION explicitly: a value for fat images, an empty
+# string for light images. Using an ARG default (not ${VAR:-...}, which also
+# fires on an empty value) keeps an explicit empty arg empty, so light images
+# skip the Scala warm-up below.
+ARG SCALA_VERSION=2.13.10
+ENV SCALA_VERSION=${SCALA_VERSION}
 ARG SBT_VERSION
 ENV SBT_VERSION=${SBT_VERSION:-1.6.2}
 ARG USER_ID
@@ -50,17 +55,22 @@ USER sbtuser
 # Switch working directory
 WORKDIR /home/sbtuser
 
-# Prepare sbt (warm cache)
+# Prepare sbt (warm cache). With a Scala version set, also pre-compile a tiny
+# project so the Scala compiler + bridge are cached (fat images). Light images
+# pass an empty SCALA_VERSION and only warm sbt (which ships preloaded in its
+# distribution), so there is no Scala in the tag.
 RUN \
   umask 0002 && \
   sbt --script-version && \
-  mkdir -p project && \
-  echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
-  echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
-  echo "// force sbt compiler-bridge download" > project/Dependencies.scala && \
-  echo "case object Temp" > Temp.scala && \
-  sbt compile && \
-  rm -r project && rm build.sbt && rm Temp.scala && rm -r target
+  if [ -n "${SCALA_VERSION}" ]; then \
+    mkdir -p project && \
+    echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
+    echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
+    echo "// force sbt compiler-bridge download" > project/Dependencies.scala && \
+    echo "case object Temp" > Temp.scala && \
+    sbt compile && \
+    rm -r project && rm build.sbt && rm Temp.scala && rm -r target ; \
+  fi
 
 # Link everything into root as well
 # This allows users of this container to choose, whether they want to run the container as sbtuser (non-root) or as root
