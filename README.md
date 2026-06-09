@@ -1,6 +1,6 @@
 # Scala and sbt Dockerfile
 
-This repository provides [Scala](http://www.scala-lang.org) and [sbt](http://www.scala-sbt.org) Docker files and images.
+This repository provides [sbt](http://www.scala-sbt.org) Docker files and images for building [Scala](http://www.scala-lang.org) projects. The images install sbt (which resolves the project's Scala version itself); a standalone `scala` CLI is not bundled.
 
 As we think referencing unstable versions is a bad idea we don't publish a `latest` tag. Our tags consists of three parts: `<JDK version>_<sbt version>_<Scala version>`.
 
