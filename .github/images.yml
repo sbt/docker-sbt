@@ -25,7 +25,7 @@ javaImage:
   # https://hub.docker.com/_/eclipse-temurin/tags
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
-    baseImageTag: '25.0.1_8-jdk'
+    baseImageTag: '25.0.3_9-jdk'
     platforms: 'linux/amd64,linux/arm64'
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
@@ -39,7 +39,7 @@ javaImage:
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
-    baseImageTag: '25.0.1_8-jdk-alpine'
+    baseImageTag: '25.0.3_9-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
@@ -94,7 +94,7 @@ javaImage:
   # sbt server down before cleanup.
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
-    baseImageTag: '25.0.1_8-jdk'
+    baseImageTag: '25.0.3_9-jdk'
     platforms: 'linux/amd64'
     dropScala: ['2.12', '2.13']
     # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-RC(?<build>\d+)$
