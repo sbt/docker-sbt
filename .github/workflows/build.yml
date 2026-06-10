@@ -49,6 +49,8 @@ jobs:
         #   majorLabel  - same but only the JDK major (e.g. eclipse-temurin-25)
         #   scalasFor   - Scala versions to build for an image (global list minus
         #                 the image's dropScala "major.minor" prefixes)
+        #   lightSbtsFor - lightSbt versions to build for an image (global list
+        #                 minus the image's dropSbt prefixes)
         #   sbtLine     - rolling line for an sbt version (1.12.11 -> 1.x)
         defs='
           def imageLabel($img):
@@ -66,6 +68,9 @@ jobs:
           def scalasFor($root; $img):
             [ $root.scalaVersion[] | . as $s
               | select([ ($img.dropScala // [])[] as $p | $s | startswith($p) ] | any | not) ];
+          def lightSbtsFor($root; $img):
+            [ $root.lightSbt[] | . as $s
+              | select([ ($img.dropSbt // [])[] as $p | $s | startswith($p) ] | any | not) ];
           def sbtLine($sbt): ($sbt | capture("^(?<m>[0-9]+)").m) + ".x";
         '
         # build matrix: fat (javaImage x scala) + light (light:true x lightSbt),
@@ -92,7 +97,7 @@ jobs:
                 | ($img.platforms | split(",")[]) as $platform
                 | entry($img; $scala; $sbt; (imageLabel($img) + "_" + $sbt + "_" + $scala); $platform) ]
             + [ $root.javaImage[] as $img | select($img.light == true)
-                | $root.lightSbt[] as $sbt
+                | (lightSbtsFor($root; $img))[] as $sbt
                 | ($img.platforms | split(",")[]) as $platform
                 | entry($img; ""; $sbt; (imageLabel($img) + "_" + $sbt); $platform) ] )')
         # merge matrix: one job per build identity (`key`, matches the digest
@@ -106,7 +111,7 @@ jobs:
                 | (imageLabel($img) + "_" + ($img.sbt // $root.SBT_VERSION) + "_" + $scala) as $t
                 | { key: $t, tags: $t, platformCount: ($img.platforms | split(",") | length) } ]
             + [ $root.javaImage[] as $img | select($img.light == true)
-                | $root.lightSbt[] as $sbt
+                | (lightSbtsFor($root; $img))[] as $sbt
                 | sbtLine($sbt) as $line
                 | { key: (imageLabel($img) + "_" + $sbt),
                     tags: (majorLabel($img) + "_" + $line + " " + imageLabel($img) + "_" + $line),
