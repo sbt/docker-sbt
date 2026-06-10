@@ -68,7 +68,7 @@ javaImage:
   # https://github.com/graalvm/container/pkgs/container/jdk-community
   # renovate: datasource=docker depName=ghcr.io/graalvm/jdk-community versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-ol(?<build>\d+)$
   - dockerContext: 'graalvm-jdk-community'
-    baseImageTag: '25.0.1-ol10'
+    baseImageTag: '25.0.2-ol10'
     platforms: 'linux/amd64,linux/arm64'
     dropScala: ['2.12']
 
