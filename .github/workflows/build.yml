@@ -1,10 +1,12 @@
 name: Build
 
-# Cancel a superseded in-progress run when a PR is updated by a newer push.
-# Scoped to pull_request so master/scheduled publishes are never interrupted.
+# Only build the latest commit per ref: a newer run cancels a superseded
+# in-progress one. Safe for master/scheduled publishes too, because every run
+# rebuilds and republishes all tags, so the superseding run converges the
+# registry to the latest commit.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 # prepare -> build (one job per arch on a native runner: test + push by digest)
 #         -> merge  (assemble the multi-arch tag from the per-arch digests)
