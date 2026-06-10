@@ -33,7 +33,7 @@ javaImage:
     platforms: 'linux/amd64,linux/arm64'
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
   - dockerContext: 'eclipse-temurin'
-    baseImageTag: '17.0.15_6-jdk'
+    baseImageTag: '17.0.19_10-jdk'
     platforms: 'linux/amd64,linux/arm64'
   # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
@@ -49,7 +49,7 @@ javaImage:
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
-    baseImageTag: '17.0.15_6-jdk-alpine'
+    baseImageTag: '17.0.19_10-jdk-alpine'
     platforms: 'linux/amd64'
 
   # ===== graalvm-community (GraalVM users skew modern: no Scala 2.12) =====
