@@ -1,4 +1,4 @@
-# Scala and sbt Dockerfile
+# Daily built sbt Docker images
 
 This repository provides [sbt](http://www.scala-sbt.org) Docker files and images for building [Scala](http://www.scala-lang.org) projects. The images install sbt (which resolves the project's Scala version itself); a standalone `scala` CLI is not bundled.
 
