@@ -76,7 +76,7 @@ javaImage:
   # https://hub.docker.com/_/amazoncorretto/tags
   # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
   - dockerContext: 'amazoncorretto'
-    baseImageTag: '25.0.0-al2023'
+    baseImageTag: '25.0.3-al2023'
     platforms: 'linux/amd64'
   # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
   - dockerContext: 'amazoncorretto'
