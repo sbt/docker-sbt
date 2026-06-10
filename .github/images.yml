@@ -5,6 +5,8 @@
 #   dockerfile  - Dockerfile name within the context (default: Dockerfile)
 #   platforms   - comma-separated build platforms (drives the per-arch fan-out)
 #   dropScala   - list of "major.minor" prefixes to NOT build for this image
+#   dropSbt     - list of version prefixes of lightSbt versions to NOT build
+#                 light images for (e.g. '2.' to skip the sbt 2.x line)
 #   sbt         - sbt version override (default: the top-level SBT_VERSION)
 #   light       - also build "light" images for this entry: sbt only, no Scala
 #                 warm step (sbt is pre-warmed by its distribution). Built once
@@ -55,24 +57,29 @@ javaImage:
     platforms: 'linux/amd64,linux/arm64'
     light: true
   # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
+  # No sbt 2.x light images on Alpine: the sbt 2 native launcher does not run
+  # on musl yet, see https://github.com/sbt/sbt/issues/9319
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '25.0.3_9-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
     light: true
+    dropSbt: ['2.']
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '21.0.11_10-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
     light: true
+    dropSbt: ['2.']
   # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '17.0.19_10-jdk-alpine'
     platforms: 'linux/amd64'
     light: true
+    dropSbt: ['2.']
 
   # ===== graalvm-community (GraalVM users skew modern: no Scala 2.12) =====
   # GraalVM CE only maintains the latest line (no LTS backports), so a pinned

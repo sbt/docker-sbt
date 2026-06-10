@@ -16,6 +16,8 @@ release. Each light image is published under two tags:
   (plain Dependabot can bump it), sbt still rolls.
 
 Light images are built for **sbt 1.x and sbt 2.x** (sbt 2.x requires JDK 17+).
+The Alpine variants are 1.x only for now: the sbt 2 native launcher does not run
+on musl yet ([sbt/sbt#9319](https://github.com/sbt/sbt/issues/9319)).
 
 ```
 docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-25_1.x          # light, JDK + sbt 1.x latest
