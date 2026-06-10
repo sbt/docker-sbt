@@ -84,7 +84,7 @@ javaImage:
     platforms: 'linux/amd64'
   # renovate: datasource=docker depName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
   - dockerContext: 'amazoncorretto'
-    baseImageTag: '17.0.16-al2023'
+    baseImageTag: '17.0.19-al2023'
     platforms: 'linux/amd64'
 
   # ===== sbt 2.0 release-candidate preview (eclipse-temurin LTS + latest, Scala 3 only) =====
