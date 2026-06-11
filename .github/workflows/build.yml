@@ -136,12 +136,25 @@ jobs:
     # shared runner IP pool get throttled and regularly fail the nightly run.
     # Same-repo PRs get secrets and authenticate too; fork PRs have no secrets
     # and stay anonymous. Pushing remains excluded for all PRs below.
-    - name: Log in to DockerHub
+    # Uses a public-repo read-only token so no push-capable credential sits on
+    # the runner during build and test; the read-write login happens right
+    # before the push step. The throttling hits the login endpoint itself too
+    # (docker/login-action has no retry), so retry here, and degrade to an
+    # anonymous build instead of failing the job if Hub stays unreachable.
+    - name: Log in to DockerHub (read-only)
       if: ${{ github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-      uses: docker/login-action@v4
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      continue-on-error: true
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_READ_TOKEN: ${{ secrets.DOCKERHUB_READ_TOKEN }}
+      run: |
+        for i in 1 2 3 4 5; do
+          echo "$DOCKERHUB_READ_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin && exit 0
+          echo "docker login failed (attempt $i); retrying in $((i*10))s"
+          sleep $((i*10))
+        done
+        echo "::warning::DockerHub login failed after 5 attempts; building anonymously"
+        exit 1
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4.1.0
     - name: Build and load for testing (${{ matrix.platform }})
@@ -166,6 +179,12 @@ jobs:
       # write a build file (also checks the home dir is writable) then fully
       # launch sbt, which exercises the temp/HOME writes that previously failed
       run: docker run --rm -u 1234 -w /home/sbtuser scala-sbt:test /bin/bash -c "touch build.sbt && sbt exit"
+    - name: Log in to DockerHub (read-write, for push)
+      if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
+      uses: docker/login-action@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build and push by digest (${{ matrix.platform }})
       id: push
       if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
