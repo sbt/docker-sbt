@@ -131,6 +131,15 @@ jobs:
       matrix: ${{ fromJSON(needs.prepare.outputs.build) }}
     steps:
     - uses: actions/checkout@v6
+    # Log in before anything pulls from Docker Hub (the buildkit image in the
+    # Buildx setup, the base images in the build): anonymous pulls from the
+    # shared runner IP pool get throttled and regularly fail the nightly run.
+    - name: Log in to DockerHub
+      if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
+      uses: docker/login-action@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4.1.0
     - name: Build and load for testing (${{ matrix.platform }})
@@ -155,12 +164,6 @@ jobs:
       # write a build file (also checks the home dir is writable) then fully
       # launch sbt, which exercises the temp/HOME writes that previously failed
       run: docker run --rm -u 1234 -w /home/sbtuser scala-sbt:test /bin/bash -c "touch build.sbt && sbt exit"
-    - name: Log in to DockerHub
-      if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
-      uses: docker/login-action@v4
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build and push by digest (${{ matrix.platform }})
       id: push
       if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
@@ -208,13 +211,13 @@ jobs:
         path: /tmp/digests
         pattern: digest-${{ matrix.key }}-*
         merge-multiple: true
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v4.1.0
     - name: Log in to DockerHub
       uses: docker/login-action@v4
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4.1.0
     - name: Create and push multi-arch manifest
       working-directory: /tmp/digests
       run: |
