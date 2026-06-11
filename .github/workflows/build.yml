@@ -26,7 +26,10 @@ on:
     branches:
       - master
   schedule:
-    - cron: '0 0 * * *'
+    # Off-peak slot: midnight UTC is the most congested moment on GitHub
+    # Actions and Docker Hub (everyone's default cron), which worsens the
+    # Hub connection timeouts this workflow is prone to.
+    - cron: '47 3 * * *'
 
 env:
   IMAGE: sbtscala/scala-sbt
