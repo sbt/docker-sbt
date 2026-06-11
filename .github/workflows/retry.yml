@@ -1,0 +1,25 @@
+name: Retry failed build
+
+# Docker Hub throttling regularly flakes a job or two in the nightly build.
+# The Build workflow is designed so "Re-run failed jobs" recovers cleanly
+# (see the merge job's incomplete-architectures guard); do that automatically
+# instead of by hand, up to two extra attempts.
+
+on:
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+
+jobs:
+  retry:
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.run_attempt < 3
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+    - name: Re-run failed jobs (attempt ${{ github.event.workflow_run.run_attempt }} failed)
+      run: gh run rerun ${{ github.event.workflow_run.id }} --failed --repo ${{ github.repository }}
+      env:
+        GH_TOKEN: ${{ github.token }}
