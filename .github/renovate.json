@@ -69,6 +69,12 @@
       "enabled": false
     },
     {
+      "description": "Split patch from minor for Scala so an in-minor patch (e.g. 3.3.7 -> 3.3.8) is not swallowed by a newer minor and survives the rule above",
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["scala/scala", "scala/scala3"],
+      "separateMinorPatch": true
+    },
+    {
       "description": "Keep sbt on the 1.x line (2.0 is added as a separate matrix dimension)",
       "matchDatasources": ["github-releases"],
       "matchPackageNames": ["sbt/sbt"],
