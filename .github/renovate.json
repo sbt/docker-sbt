@@ -75,7 +75,7 @@
       "separateMinorPatch": true
     },
     {
-      "description": "Keep sbt on the 1.x line (2.0 is added as a separate matrix dimension)",
+      "description": "Keep each sbt entry on its current major (1.x and 2.x lines are separate matrix dimensions); minor and patch still roll forward within each",
       "matchDatasources": ["github-releases"],
       "matchPackageNames": ["sbt/sbt"],
       "matchUpdateTypes": ["major"],
