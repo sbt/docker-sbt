@@ -49,13 +49,14 @@ USER sbtuser
 # Switch working directory
 WORKDIR /home/sbtuser
 
-# Prepare sbt (warm cache). With a Scala version set, also pre-compile a tiny
-# project so the Scala compiler + bridge are cached (fat images). Light images
-# pass an empty SCALA_VERSION and only warm sbt (which ships preloaded in its
-# distribution), so there is no Scala in the tag.
+# Prepare sbt. For fat images (a Scala version is set) compile a tiny project so
+# the Scala compiler + bridge are cached. Light images pass an empty SCALA_VERSION:
+# they ship sbt pre-installed but unwarmed (the user's project/build.properties
+# picks the sbt version at runtime anyway), so we only create ~/.sbt and ~/.cache,
+# which the root symlinks below point at. The dirs must exist or those symlinks
+# dangle and `docker run ... sbt` fails as root in the launcher (see #401).
 RUN \
   umask 0002 && \
-  sbt --script-version && \
   if [ -n "${SCALA_VERSION}" ]; then \
     mkdir -p project && \
     echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
@@ -65,6 +66,8 @@ RUN \
     sbt sbtVersion && \
     sbt compile && \
     rm -r project && rm build.sbt && rm Temp.scala && rm -r target ; \
+  else \
+    mkdir -p .sbt .cache ; \
   fi
 
 # Link everything into root as well
@@ -72,8 +75,8 @@ RUN \
 USER root
 RUN \
   rm -rf /tmp/..?* /tmp/.[!.]* * && \
-  ln -s /home/sbtuser/.cache /root/.cache && \
-  ln -s /home/sbtuser/.sbt /root/.sbt && \
+  if [ -d "/home/sbtuser/.cache" ]; then ln -s /home/sbtuser/.cache /root/.cache; fi && \
+  if [ -d "/home/sbtuser/.sbt" ]; then ln -s /home/sbtuser/.sbt /root/.sbt; fi && \
   if [ -d "/home/sbtuser/.ivy2" ]; then ln -s /home/sbtuser/.ivy2 /root/.ivy2; fi
 
 # Switch working directory back to root

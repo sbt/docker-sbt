@@ -2,13 +2,18 @@
 
 This repository provides [sbt](http://www.scala-sbt.org) Docker files and images for building [Scala](http://www.scala-lang.org) projects. The images install sbt (which resolves the project's Scala version itself); a standalone `scala` CLI is not bundled.
 
-As we think referencing unstable versions is a bad idea we don't publish a `latest` tag. The full ("fat") tags consist of three parts: `<JDK version>_<sbt version>_<Scala version>`, where a trivial project is pre-compiled so the Scala compiler is also warmed.
+As we think referencing unstable versions is a bad idea we don't publish a `latest` tag. The full ("fat") tags consist of three parts: `<JDK version>_<sbt version>_<Scala version>`, where a trivial project is pre-compiled so that **both sbt and the Scala compiler are warmed** (downloaded and cached in the image).
 
-There are also **light** images (no Scala warmup). sbt resolves the Scala version your
-project needs at build time, so the Scala part is unnecessary; and your
-`project/build.properties` already pins the exact sbt, so the light tags only
-track the sbt *line* (`1.x` / `2.x`), which always rolls forward to the latest
-release. Each light image is published under two tags:
+There are also **light** images. These do **no warmup at all** - neither sbt nor
+Scala. They simply ship the JDK with sbt installed and the user/permissions set
+up; sbt downloads its own runtime, the Scala toolchain, and your dependencies on
+first run. The point is convenience (a ready-to-use, correctly configured sbt
+environment), not a warm cache - warming a specific sbt/Scala only pays off in
+the fat images, and a light image's pinned versions would rarely match your
+project anyway (sbt resolves the Scala version your project needs, and your
+`project/build.properties` pins the exact sbt). So the light tags carry no Scala
+part and only track the sbt *line* (`1.x` / `2.x`), which always rolls forward to
+the latest release. Each light image is published under two tags:
 
 * `<JDK major>_<sbt line>`, e.g. `eclipse-temurin-25_1.x` - JDK and sbt both roll
   forward to the latest. Convenient, nothing to update.

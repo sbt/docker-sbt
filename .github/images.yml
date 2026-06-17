@@ -8,8 +8,9 @@
 #   dropSbt     - list of version prefixes of lightSbt versions to NOT build
 #                 light images for (e.g. '2.' to skip the sbt 2.x line)
 #   sbt         - sbt version override (default: the top-level SBT_VERSION)
-#   light       - also build "light" images for this entry: sbt only, no Scala
-#                 warm step (sbt is pre-warmed by its distribution). Built once
+#   light       - also build "light" images for this entry: no warmup at all
+#                 (neither sbt nor Scala); sbt is installed but its runtime, the
+#                 Scala toolchain and deps are resolved on first run. Built once
 #                 per `lightSbt` version and published under rolling tags only:
 #                 <java-major>_<sbt-line> and <java-full>_<sbt-line>, e.g.
 #                 eclipse-temurin-25_1.x and eclipse-temurin-25.0.1_8_1.x. The
