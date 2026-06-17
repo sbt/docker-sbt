@@ -175,9 +175,13 @@ jobs:
           SCALA_VERSION=${{ matrix.scala }}
         cache-to: type=gha,mode=max,scope=${{ matrix.key }}-${{ matrix.platformId }}
     - name: Test image as root (default)
-      run: docker run --rm scala-sbt:test sbt --script-version
+      # fully boot sbt (not just --script-version): this is the default run path
+      # and the only one that follows the /root/.sbt and /root/.cache symlinks,
+      # which were left dangling on light images (see #401). touch build.sbt so
+      # sbt does not refuse an empty directory.
+      run: docker run --rm scala-sbt:test /bin/bash -c "touch build.sbt && sbt exit"
     - name: Test image as sbtuser
-      run: docker run --rm -u sbtuser -w /home/sbtuser scala-sbt:test sbt --script-version
+      run: docker run --rm -u sbtuser -w /home/sbtuser scala-sbt:test /bin/bash -c "touch build.sbt && sbt exit"
     - name: Test image launches as an arbitrary uid (issue #258)
       # write a build file (also checks the home dir is writable) then fully
       # launch sbt, which exercises the temp/HOME writes that previously failed
