@@ -19,13 +19,13 @@
 #                 still pin it here so the warm cache is reproducible/rollbackable.
 
 # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
-SBT_VERSION: '1.12.12'
+SBT_VERSION: '1.12.13'
 
 # Latest sbt version per line, used to warm the light images. One entry per major
 # line (the rolling <java>_<line> tag would be ambiguous otherwise).
 lightSbt:
   # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
-  - '1.12.12'
+  - '1.12.13'
   # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$
   - '2.0.0'
 
