@@ -41,7 +41,7 @@ jobs:
       build: ${{ steps.gen.outputs.build }}
       merge: ${{ steps.gen.outputs.merge }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Generate build and merge matrices
       id: gen
       run: |
@@ -133,7 +133,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.prepare.outputs.build) }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     # Log in before anything pulls from Docker Hub (the buildkit image in the
     # Buildx setup, the base images in the build): anonymous pulls from the
     # shared runner IP pool get throttled and regularly fail the nightly run.
