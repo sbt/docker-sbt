@@ -159,7 +159,7 @@ jobs:
         echo "::warning::DockerHub login failed after 5 attempts; building anonymously"
         exit 1
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v4.1.0
+      uses: docker/setup-buildx-action@v4.2.0
     - name: Build and load for testing (${{ matrix.platform }})
       uses: docker/build-push-action@v7
       with:
@@ -245,7 +245,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v4.1.0
+      uses: docker/setup-buildx-action@v4.2.0
     - name: Create and push multi-arch manifest
       working-directory: /tmp/digests
       run: |
