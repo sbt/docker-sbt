@@ -26,7 +26,7 @@ SBT_VERSION: '1.12.13'
 lightSbt:
   # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$
   - '1.12.13'
-  # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$
+  # renovate: datasource=github-releases depName=sbt/sbt extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
   - '2.0.0'
 
 scalaVersion:
