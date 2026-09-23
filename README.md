@@ -50,14 +50,14 @@ Older tags are available at: https://hub.docker.com/r/hseeberger/scala-sbt/tags
 1. Install [Docker](https://www.docker.com)
 2. Pull [automated build](https://hub.docker.com/r/sbtscala/scala-sbt/) from public [Docker Hub Registry](https://registry.hub.docker.com):
 ```
-docker pull sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
+docker pull sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0
 ```
 Alternatively, you can build an image from the remote Dockerfile:
 ```
 docker build \
-  --build-arg BASE_IMAGE_TAG="21.0.8_9-jdk" \
-  --build-arg SBT_VERSION="1.12.11" \
-  --build-arg SCALA_VERSION="3.8.4" \
+  --build-arg BASE_IMAGE_TAG="21.0.12_8-jdk" \
+  --build-arg SBT_VERSION="1.13.0" \
+  --build-arg SCALA_VERSION="3.9.0" \
   --build-arg USER_ID=1001 \
   --build-arg GROUP_ID=1001 \
   -t sbtscala/scala-sbt \
@@ -67,14 +67,14 @@ docker build \
 ## Usage ##
 
 ```
-docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0
 ```
 
 ### Alternative commands ###
 The container contains `bash` and `sbt`.
 
 ```
-docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4 bash
+docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0 bash
 ```
 
 The standalone `scala` CLI is not bundled: sbt resolves its own Scala per project,
@@ -86,7 +86,7 @@ use the [Scala CLI](https://github.com/VirtusLab/scala-cli) image
 The container is prepared to be used with a non-root user called `sbtuser`
 
 ```
-docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
+docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0
 ```
 
 You can also run as an arbitrary user id. `HOME` is set to `/home/sbtuser`, whose
@@ -94,7 +94,7 @@ contents are group-writable for the root group (gid 0) that an arbitrary
 `-u <uid>` belongs to by default:
 
 ```
-docker run -it --rm -u 1234 -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.8_9_1.12.11_3.8.4
+docker run -it --rm -u 1234 -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0
 ```
 
 ## Automated updates with Renovate ##
