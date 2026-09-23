@@ -62,10 +62,17 @@
       "enabled": true
     },
     {
-      "description": "Keep each Scala version on its current minor branch (patch updates only)",
+      "description": "Never move a Scala entry across majors",
+      "matchDatasources": ["github-releases", "maven"],
+      "matchPackageNames": ["scala/scala", "scala/scala3", "org.scala-lang:scala3-compiler_3"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Keep Scala 2.x and the 3.x LTS lines on their current minor branch (patch updates only); Scala Next is tracked via maven so it is not matched here and follows new minors",
       "matchDatasources": ["github-releases"],
       "matchPackageNames": ["scala/scala", "scala/scala3"],
-      "matchUpdateTypes": ["major", "minor"],
+      "matchUpdateTypes": ["minor"],
       "enabled": false
     },
     {

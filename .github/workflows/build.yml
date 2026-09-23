@@ -50,8 +50,9 @@ jobs:
         #   imageLabel  - public "<java>" tag label, full JDK version (e.g.
         #                 eclipse-temurin-25.0.1_8, eclipse-temurin-alpine-25.0.1_8)
         #   majorLabel  - same but only the JDK major (e.g. eclipse-temurin-25)
-        #   scalasFor   - Scala versions to build for an image (global list minus
-        #                 the image's dropScala "major.minor" prefixes)
+        #   scalasFor   - Scala versions to build for an image (global list,
+        #                 deduplicated, minus the image's dropScala "major.minor"
+        #                 prefixes)
         #   lightSbtsFor - lightSbt versions to build for an image (global list
         #                 minus the image's dropSbt prefixes)
         #   sbtLine     - rolling line for an sbt version (1.12.11 -> 1.x)
@@ -69,7 +70,7 @@ jobs:
             ($img.baseImageTag | capture("^(?<m>[0-9]+)").m) as $maj
             | (imageLabel($img) | sub("[0-9].*$"; $maj));
           def scalasFor($root; $img):
-            [ $root.scalaVersion[] | . as $s
+            [ $root.scalaVersion | unique | .[] | . as $s
               | select([ ($img.dropScala // [])[] as $p | $s | startswith($p) ] | any | not) ];
           def lightSbtsFor($root; $img):
             [ $root.lightSbt[] | . as $s
