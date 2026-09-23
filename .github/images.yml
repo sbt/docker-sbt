@@ -37,7 +37,7 @@ scalaVersion:
   # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
   - '3.3.8'
   # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-  - '3.8.4'
+  - '3.9.0'
 
 javaImage:
   # ===== eclipse-temurin (also published as light images) =====
