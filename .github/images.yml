@@ -34,9 +34,16 @@ scalaVersion:
   - '2.12.21'
   # renovate: datasource=github-releases depName=scala/scala extractVersion=^v(?<version>.+)$ versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
   - '2.13.18'
+  # 3.3 LTS
   # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
   - '3.3.8'
+  # 3.9 LTS
   # renovate: datasource=github-releases depName=scala/scala3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
+  - '3.9.0'
+  # Scala Next: follows new minors, so it may equal the latest LTS (duplicates
+  # are built once). Tracked via Maven Central so renovate.json can tell it
+  # apart from the LTS entries.
+  # renovate: datasource=maven depName=org.scala-lang:scala3-compiler_3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
   - '3.9.0'
 
 javaImage:
