@@ -106,6 +106,33 @@ the mounted project (`target/`, ...) are owned by root on the host. Running as
 your own uid (`-u $(id -u):$(id -g)`) does not work well yet: see
 [#434](https://github.com/sbt/docker-sbt/issues/434).
 
+### In a Dockerfile ###
+
+Use the image as the build stage of a multi-stage build and copy only the
+packaged app into a JRE image. This example packages a single jar with
+[sbt-assembly](https://github.com/sbt/sbt-assembly) (add
+`addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "2.5.0")` to
+`project/plugins.sbt`):
+
+```dockerfile
+FROM sbtscala/scala-sbt:eclipse-temurin-25_2.x AS build
+USER sbtuser
+WORKDIR /home/sbtuser/app
+# Build definition first: dependencies are only resolved again when it changes
+COPY --chown=sbtuser:0 build.sbt ./
+COPY --chown=sbtuser:0 project/ project/
+RUN sbt update
+COPY --chown=sbtuser:0 . .
+# sbt 2 writes the jar to target/out/jvm/scala-<version>/<name>/
+RUN sbt assembly && cp target/out/jvm/scala-*/*/*-assembly-*.jar app.jar
+
+FROM eclipse-temurin:25-jre
+COPY --from=build /home/sbtuser/app/app.jar /app.jar
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+Add `target/` and `project/target/` to `.dockerignore`.
+
 ### In CI ###
 
 In a GitHub Actions container job:
