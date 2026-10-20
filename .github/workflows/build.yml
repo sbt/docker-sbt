@@ -187,6 +187,15 @@ jobs:
       # write a build file (also checks the home dir is writable) then fully
       # launch sbt, which exercises the temp/HOME writes that previously failed
       run: docker run --rm -u 1234 -w /home/sbtuser scala-sbt:test /bin/bash -c "touch build.sbt && sbt exit"
+    - name: Test image as an arbitrary uid from a project directory (issue #434)
+      # the documented SBT_OPTS workaround: sbt must use the image's home, not
+      # write its own into the project (JDK 17 otherwise creates a "?" dir).
+      # A tmpfs, not /tmp, as /tmp is where sbt puts its temp files.
+      run: |
+        docker run --rm -u 1234 --tmpfs /work:mode=1777 -w /work \
+          -e SBT_OPTS=-Duser.home=/home/sbtuser scala-sbt:test /bin/bash -c '
+          touch build.sbt && sbt exit &&
+          for d in "?" .sbt .cache; do [ ! -e "$d" ] || { echo "sbt wrote $d into the project"; exit 1; }; done'
     - name: Log in to DockerHub (read-write, for push)
       if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
       uses: docker/login-action@v4
