@@ -68,7 +68,7 @@ jobs:
               else error("unknown dockerContext: \($c)") end;
           def majorLabel($img):
             ($img.baseImageTag | capture("^(?<m>[0-9]+)").m) as $maj
-            | (imageLabel($img) | sub("[0-9].*$"; $maj));
+            | (imageLabel($img) | sub("-[0-9][^-]*$"; "-" + $maj));
           def scalasFor($root; $img):
             [ $root.scalaVersion | unique | .[] | . as $s
               | select([ ($img.dropScala // [])[] as $p | $s | startswith($p) ] | any | not) ];
