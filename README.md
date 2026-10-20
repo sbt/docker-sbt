@@ -20,13 +20,14 @@ the latest release. Each light image is published under two tags:
 * `<JDK version>_<sbt line>`, e.g. `eclipse-temurin-25.0.1_8_1.x` - pin the JDK
   (plain Dependabot can bump it), sbt still rolls.
 
-Light images are built for **sbt 1.x and sbt 2.x** (sbt 2.x requires JDK 17+).
-The Alpine variants are 1.x only for now: the sbt 2 native launcher does not run
-on musl yet ([sbt/sbt#9319](https://github.com/sbt/sbt/issues/9319)).
+Light images are built for **sbt 1.x and sbt 2.x** (sbt 2.x requires JDK 17+),
+on Eclipse Temurin and Amazon Corretto. The Alpine variants are 1.x only for now:
+the sbt 2 native launcher does not run on musl yet ([sbt/sbt#9319](https://github.com/sbt/sbt/issues/9319)).
 
 ```
 docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-25_1.x          # light, JDK + sbt 1.x latest
 docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-25.0.1_8_2.x    # light, pinned JDK + sbt 2.x latest
+docker run -it --rm sbtscala/scala-sbt:amazoncorretto-al2023-25_2.x     # light, Corretto + sbt 2.x latest
 ```
 
 Images are updated daily

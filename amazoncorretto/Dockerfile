@@ -9,8 +9,13 @@ ARG BASE_IMAGE_TAG
 FROM amazoncorretto:${BASE_IMAGE_TAG:-21.0.5-al2023}
 
 # Env variables
-ARG SCALA_VERSION
-ENV SCALA_VERSION=${SCALA_VERSION:-3.3.4}
+# Default only applies when the build arg is unset (manual builds). The build
+# workflow passes SCALA_VERSION explicitly: a value for fat images, an empty
+# string for light images. Using an ARG default (not ${VAR:-...}, which also
+# fires on an empty value) keeps an explicit empty arg empty, so light images
+# skip the Scala warm-up below.
+ARG SCALA_VERSION=3.3.4
+ENV SCALA_VERSION=${SCALA_VERSION}
 ARG SBT_VERSION
 ENV SBT_VERSION=${SBT_VERSION:-1.10.5}
 ARG USER_ID
@@ -49,25 +54,34 @@ USER sbtuser
 # Switch working directory
 WORKDIR /home/sbtuser
 
-# Prepare sbt (warm cache)
+# Prepare sbt. For fat images (a Scala version is set) compile a tiny project so
+# the Scala compiler + bridge are cached. Light images pass an empty SCALA_VERSION:
+# they ship sbt pre-installed but unwarmed (the user's project/build.properties
+# picks the sbt version at runtime anyway), so we only create ~/.sbt and ~/.cache,
+# which the root symlinks below point at. The dirs must exist or those symlinks
+# dangle and `docker run ... sbt` fails as root in the launcher (see #401).
 RUN \
   umask 0002 && \
-  sbt --script-version && \
-  mkdir -p project && \
-  echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
-  echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
-  echo "// force sbt compiler-bridge download" > project/Dependencies.scala && \
-  echo "case object Temp" > Temp.scala && \
-  sbt compile && \
-  rm -r project && rm build.sbt && rm Temp.scala && rm -r target
+  if [ -n "${SCALA_VERSION}" ]; then \
+    sbt --script-version && \
+    mkdir -p project && \
+    echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
+    echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
+    echo "// force sbt compiler-bridge download" > project/Dependencies.scala && \
+    echo "case object Temp" > Temp.scala && \
+    sbt compile && \
+    rm -r project && rm build.sbt && rm Temp.scala && rm -r target ; \
+  else \
+    mkdir -p .sbt .cache ; \
+  fi
 
 # Link everything into root as well
 # This allows users of this container to choose, whether they want to run the container as sbtuser (non-root) or as root
 USER root
 RUN \
   rm -rf /tmp/..?* /tmp/.[!.]* * && \
-  ln -s /home/sbtuser/.cache /root/.cache && \
-  ln -s /home/sbtuser/.sbt /root/.sbt && \
+  if [ -d "/home/sbtuser/.cache" ]; then ln -s /home/sbtuser/.cache /root/.cache; fi && \
+  if [ -d "/home/sbtuser/.sbt" ]; then ln -s /home/sbtuser/.sbt /root/.sbt; fi && \
   if [ -d "/home/sbtuser/.ivy2" ]; then ln -s /home/sbtuser/.ivy2 /root/.ivy2; fi
 
 # Switch working directory back to root
