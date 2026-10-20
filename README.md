@@ -98,6 +98,37 @@ contents are group-writable for the root group (gid 0) that an arbitrary
 docker run -it --rm -u 1234 -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0
 ```
 
+## Warming your own image ##
+
+The fat images only warm a trivial project with the sbt and Scala versions we
+picked. Warming your own image from a light tag caches exactly what your build
+uses: its sbt version, Scala version, plugins and library dependencies. Copy
+the build definition before the sources, so the warm layer is only rebuilt when
+the build changes:
+
+```dockerfile
+FROM sbtscala/scala-sbt:eclipse-temurin-25_2.x
+USER sbtuser
+WORKDIR /home/sbtuser/app
+# Build definition only: this layer is rebuilt only when the build changes
+COPY --chown=sbtuser:0 build.sbt ./
+COPY --chown=sbtuser:0 project/ project/
+# Resolves the project's sbt, Scala, plugins and library dependencies
+RUN umask 0002 && sbt update
+COPY --chown=sbtuser:0 . .
+```
+
+Add `target/` and `project/target/` to `.dockerignore` so local build output is
+not copied in.
+
+If you only need a warm cache in CI, caching the sbt and Coursier directories
+there (for example `cache: sbt` in
+[`actions/setup-java`](https://github.com/actions/setup-java)) avoids
+maintaining an image at all.
+
+The fat images are no longer extended (there are no fat sbt 2 images, for
+example); new combinations are only added as light images.
+
 ## Automated updates with Renovate ##
 
 Because the tags combine three independent versions (`<JDK>_<sbt>_<Scala>`),
