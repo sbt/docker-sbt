@@ -100,9 +100,8 @@ docker run -it --rm \
 ```
 
 The container runs as root by default, so with Docker the files sbt writes to
-the mounted project (`target/`, ...) are owned by root on the host. Running as
-your own uid (`-u $(id -u):$(id -g)`) does not work well yet: see
-[#434](https://github.com/sbt/docker-sbt/issues/434).
+the mounted project (`target/`, ...) are owned by root on the host. To run as
+another uid, see [Arbitrary user ids](#arbitrary-user-ids).
 
 ### In a Dockerfile ###
 
@@ -170,13 +169,27 @@ The container is prepared to be used with a non-root user called `sbtuser`
 docker run -it --rm -u sbtuser -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-25_2.x
 ```
 
-You can also run as an arbitrary user id. `HOME` is set to `/home/sbtuser`, whose
-contents are group-writable for the root group (gid 0) that an arbitrary
-`-u <uid>` belongs to by default. For now this only works with `/home/sbtuser`
-as the working directory ([#434](https://github.com/sbt/docker-sbt/issues/434)):
+### Arbitrary user ids ###
+You can also run as an arbitrary user id, as OpenShift does. `HOME` is set to
+`/home/sbtuser`, whose contents are group-writable for the root group (gid 0)
+that `-u <uid>` joins by default, so keep that group (`-u <uid>` or
+`-u <uid>:0`, not `-u <uid>:<gid>`).
+
+The JVM takes its home from the uid's passwd entry rather than `$HOME`, so sbt
+can miss `/home/sbtuser`: it then ignores the image's cache and writes `.sbt`
+and `.cache` into the working directory. This happens:
+
+* On Podman with any JDK: Podman adds a passwd entry for the uid with the
+  working directory as its home. `--passwd=false` avoids that on JDK 21+.
+* On JDK 17 when the uid has no passwd entry (Docker): the home becomes `?`, so
+  sbt writes into a `?` directory
+  ([sbt/sbt#9931](https://github.com/sbt/sbt/issues/9931)). JDK 21+ fall back to
+  `$HOME`.
+
+Point sbt at the image's home to avoid both:
 
 ```
-docker run -it --rm -u 1234 -w /home/sbtuser sbtscala/scala-sbt:eclipse-temurin-25_2.x
+docker run -it --rm -u 1234 -w /home/sbtuser -e SBT_OPTS=-Duser.home=/home/sbtuser sbtscala/scala-sbt:eclipse-temurin-25_2.x
 ```
 
 ## Warming your own image ##
@@ -193,9 +206,16 @@ WORKDIR /home/sbtuser/app
 # Build definition only: this layer is rebuilt only when the build changes
 COPY --chown=sbtuser:0 build.sbt ./
 COPY --chown=sbtuser:0 project/ project/
-# Resolves the project's sbt, Scala, plugins and library dependencies
-RUN umask 0002 && sbt update
+# Resolves the project's sbt, Scala, plugins and library dependencies.
+# --server keeps sbt 2 from leaving a background server running; the build
+# output and sbt's temp files are removed as other uids can't reuse them.
+RUN umask 0002 && sbt --server update && \
+    rm -rf target project/target /tmp/.sbt* /tmp/hsperfdata_sbtuser
 COPY --chown=sbtuser:0 . .
+# Make the project writable for arbitrary uids (root group) as well
+USER root
+RUN chgrp -R 0 . && chmod -R g=u .
+USER sbtuser
 ```
 
 Add `target/` and `project/target/` to `.dockerignore` so local build output is
