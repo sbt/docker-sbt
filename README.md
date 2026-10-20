@@ -71,6 +71,59 @@ docker build \
 docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0
 ```
 
+### Choosing a tag ###
+
+* Light, rolling (`eclipse-temurin-25_2.x`): nothing to update; your
+  `project/build.properties` picks the exact sbt anyway.
+* Light, pinned JDK (`eclipse-temurin-25.0.4_7_2.x`): reproducible JDK, bumped by
+  Dependabot or Renovate.
+* Fat (`eclipse-temurin-25.0.4_7_1.13.0_3.9.0`): sbt and one Scala version
+  already downloaded. Only worth it when they match your build; otherwise keep
+  a cache between runs (below) or warm your own image from a light tag.
+
+### Building a project ###
+
+Mount the project and run sbt in it:
+
+```
+docker run -it --rm -v "$PWD":/app -w /app sbtscala/scala-sbt:eclipse-temurin-25_2.x sbt test
+```
+
+Each run starts from the image's cache, so sbt and your dependencies are
+downloaded again every time. Keep the cache in named volumes to reuse it (an
+empty volume is first filled with what the image already has cached):
+
+```
+docker run -it --rm \
+  -v sbt-cache:/home/sbtuser/.cache \
+  -v sbt-home:/home/sbtuser/.sbt \
+  -v "$PWD":/app -w /app \
+  sbtscala/scala-sbt:eclipse-temurin-25_2.x sbt test
+```
+
+The container runs as root by default, so with Docker the files sbt writes to
+the mounted project (`target/`, ...) are owned by root on the host. Running as
+your own uid (`-u $(id -u):$(id -g)`) does not work well yet: see
+[#434](https://github.com/sbt/docker-sbt/issues/434).
+
+### In CI ###
+
+In a GitHub Actions container job:
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: sbtscala/scala-sbt:eclipse-temurin-25_2.x
+    steps:
+      - uses: actions/checkout@v7
+      - run: sbt test
+```
+
+To cache dependencies between runs, run on the runner itself instead, with
+[`actions/setup-java`](https://github.com/actions/setup-java) (`cache: sbt`) and
+[`sbt/setup-sbt`](https://github.com/sbt/setup-sbt).
+
 ### Alternative commands ###
 The container contains `bash` and `sbt`.
 
