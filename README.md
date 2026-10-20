@@ -79,7 +79,7 @@ docker run -it --rm sbtscala/scala-sbt:eclipse-temurin-21.0.12_8_1.13.0_3.9.0
   Dependabot or Renovate.
 * Fat (`eclipse-temurin-25.0.4_7_1.13.0_3.9.0`): sbt and one Scala version
   already downloaded. Only worth it when they match your build; otherwise keep
-  a cache between runs (below) or warm your own image from a light tag.
+  a cache between runs (below) or [warm your own image](#warming-your-own-image).
 
 ### Building a project ###
 
@@ -174,10 +174,8 @@ COPY --chown=sbtuser:0 . .
 Add `target/` and `project/target/` to `.dockerignore` so local build output is
 not copied in.
 
-If you only need a warm cache in CI, caching the sbt and Coursier directories
-there (for example `cache: sbt` in
-[`actions/setup-java`](https://github.com/actions/setup-java)) avoids
-maintaining an image at all.
+If you only need a warm cache in CI, caching it there avoids maintaining an
+image at all (see [In CI](#in-ci)).
 
 The fat images are no longer extended (there are no fat sbt 2 images, for
 example); new combinations are only added as light images.
