@@ -131,6 +131,8 @@ COPY --from=build /home/sbtuser/app/app.jar /app.jar
 ENTRYPOINT ["java", "-jar", "/app.jar"]
 ```
 
+The jar path is the sbt 2 layout; with sbt 1.x the jar is in
+`target/scala-<version>/`, so copy `target/scala-*/*-assembly-*.jar` instead.
 Add `target/` and `project/target/` to `.dockerignore`.
 
 ### In CI ###
