@@ -61,7 +61,7 @@ javaImage:
     light: true
   # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
-    baseImageTag: '17.0.20_8-jdk'
+    baseImageTag: '17.0.20.1_1-jdk'
     platforms: 'linux/amd64,linux/arm64'
     light: true
   # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
@@ -84,7 +84,7 @@ javaImage:
   # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
-    baseImageTag: '17.0.20_8-jdk-alpine'
+    baseImageTag: '17.0.20.1_1-jdk-alpine'
     platforms: 'linux/amd64'
     light: true
     dropSbt: ['2.']
