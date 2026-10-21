@@ -49,6 +49,13 @@
   ],
   "packageRules": [
     {
+      "description": "Parse Temurin tags as <feature>.<interim>.<update>[.<patch>]_<build>-<flavor>, where the optional <patch> marks an emergency patch release",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["eclipse-temurin"],
+      "versionCompatibility": "^(?<version>\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?_\\d+)(?<compatibility>-.+)$",
+      "versioning": "loose"
+    },
+    {
       "description": "Keep each base image on its current major (parallel JDK majors are intentional)",
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["major"],

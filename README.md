@@ -244,8 +244,9 @@ docker build \
 
 Rolling light tags (`eclipse-temurin-25_2.x`) need no updates. To have
 [Renovate](https://docs.renovatebot.com) bump a pinned light tag when a new JDK
-is published, give it a custom `versioning` that parses the JDK part and stays
-on your sbt line (here `2.x`; use `_1\\.x$` for sbt 1.x):
+is published, give it a custom `versioning` that parses the JDK part
+(`<major>.<minor>.<patch>[.<build>][_<revision>]`) and stays on your sbt line
+(here `2.x`; use `_1\\.x$` for sbt 1.x):
 
 ```json
 {
@@ -254,7 +255,7 @@ on your sbt line (here `2.x`; use `_1\\.x$` for sbt 1.x):
       "description": "Parse sbtscala/scala-sbt light tags: <JDK>_<sbt line>",
       "matchDatasources": ["docker"],
       "matchPackageNames": ["sbtscala/scala-sbt"],
-      "versioning": "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:_(?<build>\\d+))?_2\\.x$"
+      "versioning": "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<build>\\d+))?(?:_(?<revision>\\d+))?_2\\.x$"
     }
   ]
 }
@@ -268,7 +269,7 @@ For the deprecated fat tags (`<JDK>_<sbt>_<Scala>`), use this `versioning`
 instead; the trailing groups match (but ignore) the sbt and Scala parts:
 
 ```
-regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)_(?<build>\\d+)_\\d+\\.\\d+\\.\\d+_\\d+\\.\\d+\\.\\d+$
+regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<build>\\d+))?_(?<revision>\\d+)_\\d+\\.\\d+\\.\\d+_\\d+\\.\\d+\\.\\d+$
 ```
 
 ## Contribution policy ##

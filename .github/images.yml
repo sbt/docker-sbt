@@ -49,17 +49,17 @@ scalaVersion:
 javaImage:
   # ===== eclipse-temurin (also published as light images) =====
   # https://hub.docker.com/_/eclipse-temurin/tags
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     baseImageTag: '25.0.4_7-jdk'
     platforms: 'linux/amd64,linux/arm64'
     light: true
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     baseImageTag: '21.0.12_8-jdk'
     platforms: 'linux/amd64,linux/arm64'
     light: true
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk$
+  # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     baseImageTag: '17.0.20_8-jdk'
     platforms: 'linux/amd64,linux/arm64'
@@ -67,21 +67,21 @@ javaImage:
   # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
   # No sbt 2.x light images on Alpine: the sbt 2 native launcher does not run
   # on musl yet, see https://github.com/sbt/sbt/issues/9319
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+  # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '25.0.4_7-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
     light: true
     dropSbt: ['2.']
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+  # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '21.0.12_8-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
     light: true
     dropSbt: ['2.']
-  # renovate: datasource=docker depName=eclipse-temurin versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)_(?<build>\d+)-jdk-alpine$
+  # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '17.0.20_8-jdk-alpine'
