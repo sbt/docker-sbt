@@ -31,6 +31,18 @@ RUN \
   apt-get install -y curl git rpm && \
   rm -rf /var/lib/apt/lists/*
 
+# Distrust the compromised eMudhra/emSign CAs (CVE-2026-91403, see
+# https://github.com/sbt/docker-sbt/issues/449): delete their roots and the
+# Sectigo "AAA Certificate Services" cross-sign root from the JDK trust store
+# (current Sectigo chains end at USERTrust instead). Matched by owner because
+# the aliases differ per vendor. Fails the build if any are left; a no-op once
+# the base image ships a fixed trust store.
+RUN \
+  keytool -list -v -cacerts -storepass changeit \
+    | awk -F': ' '/^Alias name:/ { a = $2 } /^Owner:/ && /emSign|CN=AAA Certificate Services/ { print a }' \
+    | while IFS= read -r alias; do keytool -delete -cacerts -storepass changeit -alias "$alias"; done && \
+  ! keytool -list -v -cacerts -storepass changeit | grep -E '^Owner: .*(emSign|CN=AAA Certificate Services)'
+
 # Install sbt
 RUN \
   curl -fsL --show-error "https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz" | tar xfz - -C /usr/share && \
