@@ -33,11 +33,20 @@ ARG GROUP_ID=1001
 RUN apk add --no-cache bash git rpm
 
 # Distrust the compromised eMudhra/emSign CAs (CVE-2026-91403, see
-# https://github.com/sbt/docker-sbt/issues/449): delete their roots and the
-# Sectigo "AAA Certificate Services" cross-sign root from the JDK trust store
+# https://github.com/sbt/docker-sbt/issues/449), first in the system trust store
+# (curl, git, ...). Both steps fail the build if any are left and are a no-op
+# once the base image ships a fixed trust store.
+# Deselected in ca-certificates.conf so they stay out when the bundle is rebuilt.
+RUN \
+  sed -i -E 's#^mozilla/(emSign_.*|AAA_Certificate_Services\.crt)$#!&#' /etc/ca-certificates.conf && \
+  update-ca-certificates && \
+  ! trust list --filter=ca-anchors | grep -E '^ *label: (emSign|AAA Certificate Services)'
+
+# Then in the JDK's own trust store, which the JVM reads instead of the system
+# one (except on Amazon Linux, where it is generated from it). Also drop the
+# Sectigo "AAA Certificate Services" cross-sign root, which some JDKs still ship
 # (current Sectigo chains end at USERTrust instead). Matched by owner because
-# the aliases differ per vendor. Fails the build if any are left; a no-op once
-# the base image ships a fixed trust store.
+# the aliases differ per vendor.
 RUN \
   keytool -list -v -cacerts -storepass changeit \
     | awk -F': ' '/^Alias name:/ { a = $2 } /^Owner:/ && /emSign|CN=AAA Certificate Services/ { print a }' \
