@@ -31,7 +31,10 @@ docker run -it --rm sbtscala/scala-sbt:amazoncorretto-al2023-25_2.x    # Corrett
 ```
 
 Light images are built for **sbt 1.x and sbt 2.x** (sbt 2.x requires JDK 17+) on
-JDK 17, 21 and 25 of:
+the three newest LTS JDKs (currently 17, 21 and 25) of the images below. The
+eclipse-temurin and eclipse-temurin-alpine light images also cover the latest
+JDK release; a non-LTS JDK is replaced by the next release, so its tags stop
+being updated then.
 
 * eclipse-temurin
 * eclipse-temurin-alpine (sbt 1.x only for now: the sbt 2 native launcher does

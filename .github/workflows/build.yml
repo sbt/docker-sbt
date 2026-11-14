@@ -45,7 +45,13 @@ jobs:
     - name: Generate build and merge matrices
       id: gen
       run: |
-        data=$(yq -o=json '.' .github/images.yml)
+        # Drop javaImage entries whose dockerContext, dockerfile and JDK major
+        # repeat an earlier entry's (a "latest" slot on a pinned LTS major), as
+        # they would publish the same tags.
+        data=$(yq -o=json '.' .github/images.yml | jq '
+          def ident: [.dockerContext, (.dockerfile // "Dockerfile"), (.baseImageTag | capture("^(?<m>[0-9]+)").m)];
+          .javaImage |= reduce .[] as $img ([];
+            if any(.[]; ident == ($img | ident)) then . else . + [$img] end)')
         # jq helpers (duplicated in both programs; jq has no shared library here):
         #   imageLabel  - public "<java>" tag label, full JDK version (e.g.
         #                 eclipse-temurin-25.0.1_8, eclipse-temurin-alpine-25.0.1_8)
@@ -77,7 +83,7 @@ jobs:
               | select([ ($img.dropSbt // [])[] as $p | $s | startswith($p) ] | any | not) ];
           def sbtLine($sbt): ($sbt | capture("^(?<m>[0-9]+)").m) + ".x";
         '
-        # build matrix: fat (javaImage x scala) + light (light:true x lightSbt),
+        # build matrix: fat (javaImage with fat != false x scala) + light (light:true x lightSbt),
         # one job per (image, sbt[, scala], platform). `key` is the build identity
         # used for the cache scope and digest artifact name. For fat it is also the
         # published tag (<java>_<sbt>_<scala>); for light it is <java-full>_<sbt>
@@ -95,7 +101,7 @@ jobs:
               runner: (if ($platform | startswith("linux/arm64")) then "ubuntu-24.04-arm" else "ubuntu-24.04" end),
               sbt: $sbt };
           . as $root
-          | ( [ $root.javaImage[] as $img
+          | ( [ $root.javaImage[] as $img | select($img.fat != false)
                 | (scalasFor($root; $img))[] as $scala
                 | ($img.sbt // $root.SBT_VERSION) as $sbt
                 | ($img.platforms | split(",")[]) as $platform
@@ -110,7 +116,7 @@ jobs:
         # per line: <java-major>_<line> and <java-full>_<line> on the same digests.
         merge=$(echo "$data" | jq -c "$defs"'
           . as $root
-          | ( [ $root.javaImage[] as $img
+          | ( [ $root.javaImage[] as $img | select($img.fat != false)
                 | (scalasFor($root; $img))[] as $scala
                 | (imageLabel($img) + "_" + ($img.sbt // $root.SBT_VERSION) + "_" + $scala) as $t
                 | { key: $t, tags: $t, platformCount: ($img.platforms | split(",") | length) } ]
