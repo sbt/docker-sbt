@@ -69,10 +69,10 @@
       "enabled": true
     },
     {
-      "description": "The images' latest tag points to an LTS, so do not cap the latest slots at it",
+      "description": "Let the latest slots take non-LTS releases: config:recommended includes workarounds:javaLTSVersions, which limits eclipse-temurin and amazoncorretto to LTS majors",
       "matchDatasources": ["docker"],
       "matchDepNames": ["eclipse-temurin-latest", "amazoncorretto-latest"],
-      "respectLatest": false
+      "allowedVersions": "/^\\d/"
     },
     {
       "description": "GraalVM CE only maintains the latest line, so track it across majors",
