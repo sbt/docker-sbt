@@ -62,16 +62,16 @@
       "enabled": false
     },
     {
-      "description": "The eclipse-temurin-latest slot follows the latest JDK release across majors",
+      "description": "The latest slots follow the latest JDK release across majors",
       "matchDatasources": ["docker"],
-      "matchDepNames": ["eclipse-temurin-latest"],
+      "matchDepNames": ["eclipse-temurin-latest", "amazoncorretto-latest"],
       "matchUpdateTypes": ["major"],
       "enabled": true
     },
     {
-      "description": "eclipse-temurin:latest points to the newest LTS, so do not cap the slot at it",
+      "description": "The images' latest tag points to an LTS, so do not cap the latest slots at it",
       "matchDatasources": ["docker"],
-      "matchDepNames": ["eclipse-temurin-latest"],
+      "matchDepNames": ["eclipse-temurin-latest", "amazoncorretto-latest"],
       "respectLatest": false
     },
     {
