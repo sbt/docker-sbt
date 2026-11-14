@@ -69,6 +69,12 @@
       "enabled": true
     },
     {
+      "description": "eclipse-temurin:latest points to the newest LTS, so do not cap the slot at it",
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["eclipse-temurin-latest"],
+      "respectLatest": false
+    },
+    {
       "description": "GraalVM CE only maintains the latest line, so track it across majors",
       "matchDatasources": ["docker"],
       "matchPackageNames": ["ghcr.io/graalvm/graalvm-community", "ghcr.io/graalvm/jdk-community"],
