@@ -97,14 +97,14 @@ javaImage:
   # instead. Light only: fat images are deprecated.
   # renovate: datasource=docker depName=eclipse-temurin-latest packageName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
-    baseImageTag: '25.0.5_8-jdk'
+    baseImageTag: '27.0.1.0-jdk'
     platforms: 'linux/amd64,linux/arm64'
     fat: false
     light: true
   # renovate: datasource=docker depName=eclipse-temurin-latest packageName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
-    baseImageTag: '25.0.5_8-jdk-alpine'
+    baseImageTag: '27.0.1.0-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
     fat: false
     light: true
