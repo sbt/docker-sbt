@@ -147,3 +147,10 @@ javaImage:
     baseImageTag: '17.0.21-al2023'
     platforms: 'linux/amd64'
     light: true
+  # Latest JDK release, same rationale as the eclipse-temurin-latest slot.
+  # renovate: datasource=docker depName=amazoncorretto-latest packageName=amazoncorretto versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)-al2023$
+  - dockerContext: 'amazoncorretto'
+    baseImageTag: '25.0.5-al2023'
+    platforms: 'linux/amd64'
+    fat: false
+    light: true
