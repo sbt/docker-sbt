@@ -8,6 +8,7 @@
 #   dropSbt     - list of version prefixes of lightSbt versions to NOT build
 #                 light images for (e.g. '2.' to skip the sbt 2.x line)
 #   sbt         - sbt version override (default: the top-level SBT_VERSION)
+#   fat         - false to skip the deprecated fat images (default: true)
 #   light       - also build "light" images for this entry: no warmup at all
 #                 (neither sbt nor Scala); sbt is installed but its runtime, the
 #                 Scala toolchain and deps are resolved on first run. Built once
@@ -46,6 +47,8 @@ scalaVersion:
   # renovate: datasource=maven depName=org.scala-lang:scala3-compiler_3 versioning=regex:^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
   - '3.10.1'
 
+# Entries with the same dockerContext, dockerfile and JDK major are built once
+# (the first one wins), so a "latest" slot may sit on a pinned LTS major.
 javaImage:
   # ===== eclipse-temurin (also published as light images) =====
   # https://hub.docker.com/_/eclipse-temurin/tags
@@ -86,6 +89,24 @@ javaImage:
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '17.0.21_9-jdk-alpine'
     platforms: 'linux/amd64'
+    light: true
+    dropSbt: ['2.']
+  # Latest JDK release (LTS or not), next to the three newest LTS lines above.
+  # Renovate moves these across majors (depName eclipse-temurin-latest, see
+  # renovate.json); while the latest is an LTS the pinned entry above is built
+  # instead. Light only: fat images are deprecated.
+  # renovate: datasource=docker depName=eclipse-temurin-latest packageName=eclipse-temurin
+  - dockerContext: 'eclipse-temurin'
+    baseImageTag: '25.0.5_8-jdk'
+    platforms: 'linux/amd64,linux/arm64'
+    fat: false
+    light: true
+  # renovate: datasource=docker depName=eclipse-temurin-latest packageName=eclipse-temurin
+  - dockerContext: 'eclipse-temurin'
+    dockerfile: 'alpine.Dockerfile'
+    baseImageTag: '25.0.5_8-jdk-alpine'
+    platforms: 'linux/amd64,linux/arm64/v8'
+    fat: false
     light: true
     dropSbt: ['2.']
 

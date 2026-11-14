@@ -23,7 +23,7 @@
         "/^\\.github/images\\.yml$/"
       ],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s+- dockerContext: '[^']+'(?:\\s+dockerfile: '[^']+')?\\s+baseImageTag: '(?<currentValue>[^']+)'"
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s+- dockerContext: '[^']+'(?:\\s+dockerfile: '[^']+')?\\s+baseImageTag: '(?<currentValue>[^']+)'"
       ]
     },
     {
@@ -49,10 +49,10 @@
   ],
   "packageRules": [
     {
-      "description": "Parse Temurin tags as <feature>.<interim>.<update>[.<patch>]_<build>-<flavor>, where the optional <patch> marks an emergency patch release",
+      "description": "Parse Temurin tags as <feature>.<interim>.<update>[.<patch>][_<build>]-<flavor>, where the optional <patch> marks an emergency patch release (JDK 27 tags have no _<build>)",
       "matchDatasources": ["docker"],
       "matchPackageNames": ["eclipse-temurin"],
-      "versionCompatibility": "^(?<version>\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?_\\d+)(?<compatibility>-.+)$",
+      "versionCompatibility": "^(?<version>\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?(?:_\\d+)?)(?<compatibility>-.+)$",
       "versioning": "loose"
     },
     {
@@ -60,6 +60,13 @@
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["major"],
       "enabled": false
+    },
+    {
+      "description": "The eclipse-temurin-latest slot follows the latest JDK release across majors",
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["eclipse-temurin-latest"],
+      "matchUpdateTypes": ["major"],
+      "enabled": true
     },
     {
       "description": "GraalVM CE only maintains the latest line, so track it across majors",
