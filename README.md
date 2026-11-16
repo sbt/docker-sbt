@@ -36,8 +36,9 @@ of the images below. A non-LTS JDK is replaced by the next release, so its tags
 stop being updated then.
 
 * eclipse-temurin
-* eclipse-temurin-alpine (sbt 1.x only for now: the sbt 2 native launcher does
-  not run on musl yet, [sbt/sbt#9319](https://github.com/sbt/sbt/issues/9319))
+* eclipse-temurin-alpine (sbt 2.x runs the JVM client instead of the native
+  `sbtn` client, which has no musl build yet, see
+  [sbt/sbt#9319](https://github.com/sbt/sbt/issues/9319))
 * amazoncorretto-al2023 (amd64 only)
 
 ## Fat images (deprecated) ##
