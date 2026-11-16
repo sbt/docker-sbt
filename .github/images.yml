@@ -68,29 +68,24 @@ javaImage:
     platforms: 'linux/amd64,linux/arm64'
     light: true
   # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
-  # No sbt 2.x light images on Alpine: the sbt 2 native launcher does not run
-  # on musl yet, see https://github.com/sbt/sbt/issues/9319
   # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '25.0.5_8-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
     light: true
-    dropSbt: ['2.']
   # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '21.0.13_9-jdk-alpine'
     platforms: 'linux/amd64,linux/arm64/v8'
     light: true
-    dropSbt: ['2.']
   # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
     baseImageTag: '17.0.21_9-jdk-alpine'
     platforms: 'linux/amd64'
     light: true
-    dropSbt: ['2.']
   # Latest JDK release (LTS or not), next to the three newest LTS lines above.
   # Renovate moves these across majors (depName eclipse-temurin-latest, see
   # renovate.json); while the latest is an LTS the pinned entry above is built
@@ -108,7 +103,6 @@ javaImage:
     platforms: 'linux/amd64,linux/arm64/v8'
     fat: false
     light: true
-    dropSbt: ['2.']
 
   # ===== graalvm-community (GraalVM users skew modern: no Scala 2.12) =====
   # GraalVM CE only maintains the latest line (no LTS backports), so a pinned
