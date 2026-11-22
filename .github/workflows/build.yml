@@ -141,6 +141,64 @@ jobs:
       matrix: ${{ fromJSON(needs.prepare.outputs.build) }}
     steps:
     - uses: actions/checkout@v7
+    # Upstream images publish a new tag architecture by architecture, and a
+    # shared tag can lose its Linux images when only another OS still claims
+    # it. Buildx then silently picks another variant (linux/arm64 -> arm/v7,
+    # which crashes the JVM) or fails with a bare "no match for platform".
+    # Fail early with the published platform list instead. Docker Hub is
+    # asked through its tags API (does not count as a pull); other registries
+    # through the manifest. If the lookup itself fails, warn and build anyway.
+    - name: Check the base image publishes ${{ matrix.platform }}
+      env:
+        CONTEXT: ${{ matrix.context }}
+        DOCKERFILE: ${{ matrix.dockerfile }}
+        TAG: ${{ matrix.baseImageTag }}
+        PLATFORM: ${{ matrix.platform }}
+      run: |
+        repo=$(sed -nE 's/^FROM[[:space:]]+([^:[:space:]]+):\$\{BASE_IMAGE_TAG.*/\1/p' "$CONTEXT/$DOCKERFILE" | head -n1)
+        if [ -z "$repo" ]; then
+          echo "::error title=Base image check::no 'FROM <image>:\${BASE_IMAGE_TAG...}' line in $CONTEXT/$DOCKERFILE"
+          exit 1
+        fi
+        ref="$repo:$TAG"
+        # linux/<arch>[/<variant>] with arm64 and arm64/v8 treated as the same
+        norm='def norm: sub("^linux/";"") | sub("^arm64/v8$";"arm64");'
+        if [[ "${repo%%/*}" == *[.:]* && "$repo" == */* ]]; then
+          if ! raw=$(docker buildx imagetools inspect --raw "$ref" 2>&1); then
+            echo "::warning title=Base image check skipped::could not inspect $ref, building anyway: $raw"
+            exit 0
+          fi
+          if ! echo "$raw" | jq -e '.manifests' >/dev/null; then
+            echo "::warning title=Base image check skipped::$ref is a single-platform manifest, building anyway"
+            exit 0
+          fi
+          published=$(echo "$raw" | jq -c '[.manifests[].platform | select(.os == "linux")
+            | "linux/" + .architecture + (if .variant then "/" + .variant else "" end)]')
+        else
+          hubrepo=$repo; [[ "$hubrepo" == */* ]] || hubrepo="library/$hubrepo"
+          body=$(mktemp)
+          code=$(curl -sS --retry 3 --retry-all-errors --max-time 20 -o "$body" -w '%{http_code}' \
+            "https://hub.docker.com/v2/repositories/$hubrepo/tags/$TAG" || true)
+          if [ "$code" = 404 ]; then
+            echo "::error title=Base image missing::$ref does not exist on Docker Hub"
+            exit 1
+          elif [ "$code" != 200 ]; then
+            echo "::warning title=Base image check skipped::Docker Hub tags API answered HTTP $code for $ref, building anyway"
+            exit 0
+          fi
+          published=$(jq -c '[.images[] | select(.os == "linux")
+            | "linux/" + .architecture + (if .variant then "/" + .variant else "" end)]' "$body")
+        fi
+        list=$(echo "$published" | jq -r 'unique | join(", ")')
+        if echo "$published" | jq -e --arg p "$PLATFORM" "$norm"' any(.[]; norm == ($p | norm))' >/dev/null; then
+          echo "$ref publishes $PLATFORM (all linux platforms: $list)"
+        elif [ -z "$list" ]; then
+          echo "::error title=Base image has no Linux images::$ref holds no Linux images (any more); upstream probably moved Linux to a newer tag: bump baseImageTag."
+          exit 1
+        else
+          echo "::error title=Base image platform missing::$ref has no $PLATFORM image (yet); published linux platforms: $list. Upstream may still be publishing this architecture: re-run once it is there."
+          exit 1
+        fi
     # Log in before anything pulls from Docker Hub (the buildkit image in the
     # Buildx setup, the base images in the build): anonymous pulls from the
     # shared runner IP pool get throttled and regularly fail the nightly run.
