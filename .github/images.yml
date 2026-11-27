@@ -64,7 +64,7 @@ javaImage:
     light: true
   # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
-    baseImageTag: '17.0.21_9-jdk'
+    baseImageTag: '17.0.21.1_2-jdk'
     platforms: 'linux/amd64,linux/arm64'
     light: true
   # https://hub.docker.com/_/eclipse-temurin/tags?page=1&name=alpine
@@ -83,7 +83,7 @@ javaImage:
   # renovate: datasource=docker depName=eclipse-temurin
   - dockerContext: 'eclipse-temurin'
     dockerfile: 'alpine.Dockerfile'
-    baseImageTag: '17.0.21_9-jdk-alpine'
+    baseImageTag: '17.0.21.1_2-jdk-alpine'
     platforms: 'linux/amd64'
     light: true
   # Latest JDK release (LTS or not), next to the three newest LTS lines above.
